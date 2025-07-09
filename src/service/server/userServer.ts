@@ -23,6 +23,7 @@ const userServer = new Server();
 const handler: UserServiceHandlers = {
   LoginUser: userHandler.LoginUser,
   RegisterUser: userHandler.RegisterUser,
+  CreateAdminUser: userHandler.CreateAdminUser,
 };
 
 userServer.addService(userDef.user.UserService.service, handler);

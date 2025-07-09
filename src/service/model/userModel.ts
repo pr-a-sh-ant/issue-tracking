@@ -7,11 +7,8 @@ import mysql2 from "mysql2/promise";
 export interface User {
   id: number;
   name: string;
-  phone: string | null;
-  email: string | null;
   password: string;
   role: string;
-  createdAt: Date;
 }
 
 const LoginUser = async ({
@@ -25,7 +22,7 @@ const LoginUser = async ({
 }) => {
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
-      "SELECT * FROM users WHERE email = ? OR phone = ?",
+      "SELECT user.id, user.password, user.role FROM users WHERE email = ? OR phone = ?",
       [email, phone]
     );
     if (rows.length === 0) {
@@ -39,10 +36,7 @@ const LoginUser = async ({
     return {
       id: user.id,
       name: user.name,
-      phone: user.phone,
-      email: user.email,
       role: user.role,
-      createdAt: user.createdAt,
     };
   } catch (error: any) {
     throw new Error(error.message || "Database error");

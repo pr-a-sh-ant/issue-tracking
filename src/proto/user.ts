@@ -9,6 +9,7 @@ type SubtypeConstructor<Constructor extends new (...args: any) => any, Subtype> 
 
 export interface ProtoGrpcType {
   user: {
+    AdminRegisterResponse: MessageTypeDefinition
     LoginRequest: MessageTypeDefinition
     LoginResponse: MessageTypeDefinition
     RegisterRequest: MessageTypeDefinition

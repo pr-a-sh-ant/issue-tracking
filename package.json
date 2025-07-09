@@ -12,8 +12,8 @@
     "prestart": "npm run build",
     "start": "node dist/server.js",
     "preserver": "npm run build",
-    "generate:porto": "node_modules/.bin/proto-loader-gen-types -I=./proto proto/*proto --outDir=proto/ proto/*.proto --grpcLib=@grpc/grpc-js",
-    "proto:watch": "chokidar 'proto/*.proto' -c 'npm run generate:proto'",
+    "generate:proto": "node_modules/.bin/proto-loader-gen-types -I=.src/proto src/proto/*proto --outDir=src/proto/ src/proto/*.proto --grpcLib=@grpc/grpc-js",
+    "proto:watch": "chokidar 'src/proto/*.proto' -c 'npm run generate:proto'",
     "serve": "concurrently \"npx tsc -w\" \"nodemon dist/service/index.js\""
   },
   "author": "",

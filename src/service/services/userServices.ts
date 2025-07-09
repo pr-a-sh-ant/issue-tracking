@@ -5,6 +5,7 @@ import { LoginRequest } from "../../proto/user/LoginRequest";
 import { LoginResponse } from "../../proto/user/LoginResponse";
 import { RegisterRequest } from "../../proto/user/RegisterRequest";
 import { RegisterResponse } from "../../proto/user/RegisterResponse";
+import { AdminRegisterResponse } from "../../proto/user/AdminRegisterResponse";
 
 // Importing the helper functions and models
 import UserModel from "../model/userModel";
@@ -57,9 +58,32 @@ const RegisterUser = async (
   }
 };
 
+const AdminRegisterUser = async (
+  call: ServerUnaryCall<RegisterRequest, AdminRegisterResponse>,
+  callback: sendUnaryData<AdminRegisterResponse>
+) => {
+  try {
+    const userDetail = call.request;
+    const data = await UserModel.RegisterUser(userDetail, "admin");
+    callback(null, {
+      message: "Registration successful",
+      adminId: data.insertId.toString(),
+      email: userDetail.email,
+      password: userDetail.password,
+    });
+  } catch (error: any) {
+    console.error("Error in RegisterUser:", error);
+    callback({
+      code: status.INTERNAL,
+      details: error.message || "Internal server error",
+    });
+  }
+};
+
 const userHandler = {
   LoginUser: LoginRequest,
   RegisterUser: RegisterUser,
+  CreateAdminUser: AdminRegisterUser,
 };
 
 export default userHandler;

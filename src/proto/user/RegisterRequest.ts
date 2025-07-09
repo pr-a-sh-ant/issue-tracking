@@ -1,4 +1,4 @@
-// Original file: proto/user.proto
+// Original file: src/proto/user.proto
 
 
 export interface RegisterRequest {

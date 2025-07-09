@@ -24,22 +24,24 @@ export default {
         allowNull: false,
       },
       status: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("NEW", "ACK", "PENDING", "RESOLVED", "CLOSED"),
         allowNull: false,
         defaultValue: "NEW",
-        enum: ["NEW", "ACK", "PENDING", "RESOLVED", "CLOSED"],
       },
       urgency: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("LOW", "MEDIUM", "HIGH"),
         allowNull: false,
         defaultValue: "LOW",
-        enum: ["LOW", "MEDIUM", "HIGH"],
       },
       impact: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("LOW", "MEDIUM", "HIGH"),
         allowNull: false,
         defaultValue: "LOW",
-        enum: ["LOW", "MEDIUM", "HIGH"],
+      },
+      priority: {
+        type: Sequelize.ENUM("P1", "P2", "P3", "P4"),
+        allowNull: false,
+        defaultValue: "P2",
       },
       created_by: {
         type: Sequelize.INTEGER,
