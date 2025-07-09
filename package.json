@@ -1,0 +1,46 @@
+{
+  "name": "issue-tracking",
+  "version": "1.0.0",
+  "scripts": {
+    "migration:create": "npx sequelize-cli migration:create --name",
+    "start:migrate": "npx sequelize-cli db:migrate",
+    "migration:undo": "npx sequelize-cli db:migrate:undo",
+    "seeder:create": "npx sequelize-cli seed:create --name",
+    "start:seed": "npx sequelize-cli db:seed:all",
+    "seed:undo": "npx sequelize-cli db:seed:undo",
+    "build": "rimraf dist && npx tsc",
+    "prestart": "npm run build",
+    "start": "node dist/server.js",
+    "preserver": "npm run build",
+    "generate:porto": "node_modules/.bin/proto-loader-gen-types -I=./proto proto/*proto --outDir=proto/ proto/*.proto --grpcLib=@grpc/grpc-js",
+    "proto:watch": "chokidar 'proto/*.proto' -c 'npm run generate:proto'",
+    "serve": "concurrently \"npx tsc -w\" \"nodemon dist/service/index.js\""
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.13.4",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.1",
+    "redis": "^5.6.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.7.7",
+    "@swc/core": "^1.12.11",
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.0.10",
+    "chokidar-cli": "^3.0.0",
+    "concurrently": "^9.2.0",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2",
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.3",
+    "ts-proto": "^2.7.5"
+  }
+}
