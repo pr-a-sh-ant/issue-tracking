@@ -22,7 +22,7 @@ const LoginUser = async ({
 }) => {
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
-      "SELECT user.id, user.password, user.role FROM users WHERE email = ? OR phone = ?",
+      "SELECT u.id, u.password, u.role FROM users as u WHERE email = ? OR phone = ?",
       [email, phone]
     );
     if (rows.length === 0) {

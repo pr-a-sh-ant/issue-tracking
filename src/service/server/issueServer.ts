@@ -4,6 +4,7 @@ import { ProtoGrpcType } from "../../proto/issue";
 import { IssueServiceHandlers } from "../../proto/issue/IssueService";
 import issueHandler from "../services/issueServices";
 import withAuth from "../middleware/withAuth";
+import withRoleAuth from "../middleware/withRoleAuth";
 
 const PORTO_PATH = "src/proto/issue.proto";
 
@@ -23,6 +24,10 @@ const issueServer = new Server();
 
 const handler = {
   CreateIssue: withAuth(issueHandler.createIssue),
+  GetIssue: withAuth(issueHandler.getIssue),
+  AssignIssue: withAuth(
+    withRoleAuth(["admin", "superadmin"], issueHandler.assignIssue)
+  ),
 };
 
 issueServer.addService(issueDef.issue.IssueService.service, handler);
