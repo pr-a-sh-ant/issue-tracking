@@ -7,6 +7,10 @@ import { GetIssueRequest } from "src/proto/issue/GetIssueRequest";
 import { GetIssueResponse } from "src/proto/issue/GetIssueResponse";
 import { AssignIssueRequest } from "src/proto/issue/AssignIssueRequest";
 import { AssignIssueResponse } from "src/proto/issue/AssignIssueResponse";
+import { ListIssuesRequest } from "src/proto/issue/ListIssuesRequest";
+import { ListIssuesResponse } from "src/proto/issue/ListIssuesResponse";
+import { UpdateIssueRequest } from "src/proto/issue/UpdateIssueRequest";
+import { UpdateIssueResponse } from "src/proto/issue/UpdateIssueResponse";
 
 // Creating helper function and model
 import issueModel from "../model/issueModel";
@@ -43,7 +47,6 @@ const getIssue = async (
 ) => {
   try {
     const { issueId } = call.request;
-    // @ts-ignore
     if (!issueId) {
       return callback({
         code: status.INVALID_ARGUMENT,
@@ -78,19 +81,82 @@ const assignIssue = async (
   try {
     const { issueId } = call.request;
     // @ts-ignore
+    const adminId = call.user?.userId;
     if (!issueId) {
-      return callback({
+      callback({
         code: status.INVALID_ARGUMENT,
         message: "Issue ID is required",
       });
     }
+    const result = await issueModel.assignIssue(parseInt(issueId), adminId);
     callback(null, {
-      message: "Issue assigned successfully",
+      message: result.message || "Issue assigned successfully",
+      status: status.OK.toString(),
       issueId: issueId,
     });
-  } catch (error: any) {}
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      message: error.message || "Internal server error",
+    });
+  }
 };
 
-const issueHandler = { createIssue, getIssue, assignIssue };
+const listIssues = async (
+  call: ServerUnaryCall<ListIssuesRequest, ListIssuesResponse>,
+  callback: sendUnaryData<ListIssuesResponse>
+) => {
+  try {
+    const result = await issueModel.listAllIssues();
+    callback(null, {
+      message: "All issues retrieved successfully",
+      issues: result,
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
+const listIssuesByUser = async (
+  call: ServerUnaryCall<ListIssuesRequest, ListIssuesResponse>,
+  callback: sendUnaryData<ListIssuesResponse>
+) => {
+  try {
+    //@ts-ignore
+    const userId = call.user?.userId;
+    const result = await issueModel.listIssuesByUser(userId);
+    callback(null, {
+      message: "Issues listed successfully",
+      issues: result,
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
+const updateIssue = async (
+  call: ServerUnaryCall<UpdateIssueRequest, UpdateIssueResponse>,
+  callback: sendUnaryData<UpdateIssueResponse>
+) => {
+  callback({
+    code: status.UNIMPLEMENTED,
+    message: "UpdateIssue is not implemented yet",
+  });
+};
+
+const issueHandler = {
+  updateIssue,
+  createIssue,
+  getIssue,
+  assignIssue,
+  listIssues,
+  listIssuesByUser,
+};
 
 export default issueHandler;

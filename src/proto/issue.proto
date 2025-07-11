@@ -7,6 +7,7 @@ service IssueService {
     rpc GetIssue (GetIssueRequest) returns (GetIssueResponse);
     rpc UpdateIssue (UpdateIssueRequest) returns (UpdateIssueResponse);
     rpc AssignIssue (AssignIssueRequest) returns (AssignIssueResponse);
+    rpc ListIssuesByUser (ListIssuesRequest) returns (ListIssuesResponse);
     rpc ListIssues (ListIssuesRequest) returns (ListIssuesResponse);
 }
 

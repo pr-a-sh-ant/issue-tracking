@@ -22,12 +22,17 @@ const issueDef = loadPackageDefinition(
 
 const issueServer = new Server();
 
-const handler = {
+const handler: IssueServiceHandlers = {
   CreateIssue: withAuth(issueHandler.createIssue),
   GetIssue: withAuth(issueHandler.getIssue),
   AssignIssue: withAuth(
     withRoleAuth(["admin", "superadmin"], issueHandler.assignIssue)
   ),
+  ListIssues: withAuth(
+    withRoleAuth(["admin", "superadmin"], issueHandler.listIssues)
+  ),
+  ListIssuesByUser: withAuth(issueHandler.listIssuesByUser),
+  UpdateIssue: withAuth(issueHandler.updateIssue),
 };
 
 issueServer.addService(issueDef.issue.IssueService.service, handler);

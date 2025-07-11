@@ -4,6 +4,7 @@ import { ProtoGrpcType } from "../../proto/user";
 import { UserServiceHandlers } from "../../proto/user/UserService";
 import userHandler from "../services/userServices";
 import withAuth from "../middleware/withAuth";
+import withRoleAuth from "../middleware/withRoleAuth";
 
 const PORTO_PATH = "src/proto/user.proto";
 
@@ -24,7 +25,9 @@ const userServer = new Server();
 const handler: UserServiceHandlers = {
   LoginUser: userHandler.LoginUser,
   RegisterUser: userHandler.RegisterUser,
-  CreateAdminUser: withAuth(userHandler.CreateAdminUser),
+  CreateAdminUser: withAuth(
+    withRoleAuth(["superadmin"], userHandler.CreateAdminUser)
+  ),
 };
 
 userServer.addService(userDef.user.UserService.service, handler);

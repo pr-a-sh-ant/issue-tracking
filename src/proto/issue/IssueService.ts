@@ -50,6 +50,15 @@ export interface IssueServiceClient extends grpc.Client {
   listIssues(argument: _issue_ListIssuesRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_ListIssuesResponse__Output>): grpc.ClientUnaryCall;
   listIssues(argument: _issue_ListIssuesRequest, callback: grpc.requestCallback<_issue_ListIssuesResponse__Output>): grpc.ClientUnaryCall;
   
+  ListIssuesByUser(argument: _issue_ListIssuesRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_ListIssuesResponse__Output>): grpc.ClientUnaryCall;
+  ListIssuesByUser(argument: _issue_ListIssuesRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_issue_ListIssuesResponse__Output>): grpc.ClientUnaryCall;
+  ListIssuesByUser(argument: _issue_ListIssuesRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_ListIssuesResponse__Output>): grpc.ClientUnaryCall;
+  ListIssuesByUser(argument: _issue_ListIssuesRequest, callback: grpc.requestCallback<_issue_ListIssuesResponse__Output>): grpc.ClientUnaryCall;
+  listIssuesByUser(argument: _issue_ListIssuesRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_ListIssuesResponse__Output>): grpc.ClientUnaryCall;
+  listIssuesByUser(argument: _issue_ListIssuesRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_issue_ListIssuesResponse__Output>): grpc.ClientUnaryCall;
+  listIssuesByUser(argument: _issue_ListIssuesRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_ListIssuesResponse__Output>): grpc.ClientUnaryCall;
+  listIssuesByUser(argument: _issue_ListIssuesRequest, callback: grpc.requestCallback<_issue_ListIssuesResponse__Output>): grpc.ClientUnaryCall;
+  
   UpdateIssue(argument: _issue_UpdateIssueRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssueResponse__Output>): grpc.ClientUnaryCall;
   UpdateIssue(argument: _issue_UpdateIssueRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_issue_UpdateIssueResponse__Output>): grpc.ClientUnaryCall;
   UpdateIssue(argument: _issue_UpdateIssueRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssueResponse__Output>): grpc.ClientUnaryCall;
@@ -70,6 +79,8 @@ export interface IssueServiceHandlers extends grpc.UntypedServiceImplementation 
   
   ListIssues: grpc.handleUnaryCall<_issue_ListIssuesRequest__Output, _issue_ListIssuesResponse>;
   
+  ListIssuesByUser: grpc.handleUnaryCall<_issue_ListIssuesRequest__Output, _issue_ListIssuesResponse>;
+  
   UpdateIssue: grpc.handleUnaryCall<_issue_UpdateIssueRequest__Output, _issue_UpdateIssueResponse>;
   
 }
@@ -79,5 +90,6 @@ export interface IssueServiceDefinition extends grpc.ServiceDefinition {
   CreateIssue: MethodDefinition<_issue_CreateIssueRequest, _issue_CreateIssueResponse, _issue_CreateIssueRequest__Output, _issue_CreateIssueResponse__Output>
   GetIssue: MethodDefinition<_issue_GetIssueRequest, _issue_GetIssueResponse, _issue_GetIssueRequest__Output, _issue_GetIssueResponse__Output>
   ListIssues: MethodDefinition<_issue_ListIssuesRequest, _issue_ListIssuesResponse, _issue_ListIssuesRequest__Output, _issue_ListIssuesResponse__Output>
+  ListIssuesByUser: MethodDefinition<_issue_ListIssuesRequest, _issue_ListIssuesResponse, _issue_ListIssuesRequest__Output, _issue_ListIssuesResponse__Output>
   UpdateIssue: MethodDefinition<_issue_UpdateIssueRequest, _issue_UpdateIssueResponse, _issue_UpdateIssueRequest__Output, _issue_UpdateIssueResponse__Output>
 }

@@ -1,5 +1,5 @@
 import type * as grpc from '@grpc/grpc-js';
-import type { MessageTypeDefinition } from '@grpc/proto-loader';
+import type { EnumTypeDefinition, MessageTypeDefinition } from '@grpc/proto-loader';
 
 import type { IssueServiceClient as _issue_IssueServiceClient, IssueServiceDefinition as _issue_IssueServiceDefinition } from './issue/IssueService';
 
@@ -15,12 +15,15 @@ export interface ProtoGrpcType {
     CreateIssueResponse: MessageTypeDefinition
     GetIssueRequest: MessageTypeDefinition
     GetIssueResponse: MessageTypeDefinition
+    ImpactEnum: EnumTypeDefinition
     Issue: MessageTypeDefinition
     IssueService: SubtypeConstructor<typeof grpc.Client, _issue_IssueServiceClient> & { service: _issue_IssueServiceDefinition }
     ListIssuesRequest: MessageTypeDefinition
     ListIssuesResponse: MessageTypeDefinition
+    StatusEnum: EnumTypeDefinition
     UpdateIssueRequest: MessageTypeDefinition
     UpdateIssueResponse: MessageTypeDefinition
+    UrgencyEnum: EnumTypeDefinition
   }
 }
 
