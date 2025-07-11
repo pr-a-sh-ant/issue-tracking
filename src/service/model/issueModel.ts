@@ -29,15 +29,20 @@ const createIssue = async (
   }
 };
 
-const getIssue = async (issueId: number) => {
+const getIssue = async (issueId: number, role: string, userId: number) => {
   try {
+    const isAdmin = role === "admin";
     const sql = mysql2.format(
-      "SELECT i.issue_id, i.title, i.description, i.status, i.urgency, i.impact, u.name as created_by, i.admin_id, i.created_at, i.updated_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id WHERE issue_id = ?",
+      "SELECT i.issue_id, i.title, i.description, i.status, i.urgency, i.impact, u.name as created_by, i.admin_id, i.created_at, i.updated_at, u.id, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id WHERE issue_id = ?",
       [issueId]
     );
+
     const [rows] = await pool.query<RowDataPacket[]>(sql);
     if (rows.length === 0) {
       throw new Error("Issue not found");
+    }
+    if (!isAdmin && rows[0].id !== userId) {
+      throw new Error("You do not have permission to view this issue");
     }
     return rows[0] as Issue;
   } catch (error: any) {
@@ -66,7 +71,6 @@ const assignIssue = async (issueId: number, adminId: number) => {
       [adminId, issueId]
     );
     const [result] = await pool.query<RowDataPacket[]>(sql);
-    console.log(result);
     return { message: "Issue assigned successfully" };
   } catch (error: any) {
     throw new Error(`Error assigning issue: ${error.message}`);
@@ -76,7 +80,7 @@ const assignIssue = async (issueId: number, adminId: number) => {
 const listIssuesByUser = async (userId: number) => {
   try {
     const sql = mysql2.format(
-      "SELECT i.issue_id, i.title, i.description, i.status, i.urgency, i.impact, u.name as created_by, i.admin_id, i.created_at, i.updated_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id WHERE i.created_by = ?",
+      "SELECT i.issue_id, i.title, i.status,i.impact, u.name as created_by, i.admin_id, i.created_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id where i.created_by = ?",
       [userId]
     );
     const [rows] = await pool.query<RowDataPacket[]>(sql);
@@ -91,7 +95,7 @@ const listIssuesByUser = async (userId: number) => {
 
 const listAllIssues = async () => {
   try {
-    const sql = `SELECT i.issue_id, i.title, i.description, i.status, i.urgency, i.impact, u.name as created_by, i.admin_id, i.created_at, i.updated_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id`;
+    const sql = `SELECT i.issue_id, i.title, i.status, i.impact, u.name as created_by, i.admin_id, i.created_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id`;
     const [rows] = await pool.query<RowDataPacket[]>(sql);
     return rows as Issue[];
   } catch (error: any) {

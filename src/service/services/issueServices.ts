@@ -47,6 +47,8 @@ const getIssue = async (
 ) => {
   try {
     const { issueId } = call.request;
+    // @ts-ignore
+    const user = call.user;
     if (!issueId) {
       return callback({
         code: status.INVALID_ARGUMENT,
@@ -54,7 +56,11 @@ const getIssue = async (
       });
     }
 
-    const issue = await issueModel.getIssue(parseInt(issueId));
+    const issue = await issueModel.getIssue(
+      parseInt(issueId),
+      user?.role,
+      user?.userId
+    );
 
     if (!issue) {
       return callback({
@@ -135,7 +141,7 @@ const listIssuesByUser = async (
   } catch (error: any) {
     callback({
       code: status.INTERNAL,
-      message: error.message || "Internal server error",
+      message: error.message || "Internal server error while listing issues",
     });
   }
 };
