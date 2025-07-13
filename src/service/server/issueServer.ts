@@ -32,7 +32,16 @@ const handler: IssueServiceHandlers = {
     withRoleAuth(["admin", "superadmin"], issueHandler.listIssues)
   ),
   ListIssuesByUser: withAuth(issueHandler.listIssuesByUser),
-  UpdateIssue: withAuth(issueHandler.updateIssue),
+  UpdateIssueDetails: withAuth(issueHandler.updateIssueDetails),
+  UpdateIssuePriorityImpact: withAuth(
+    withRoleAuth(
+      ["admin", "superadmin"],
+      issueHandler.updateIssuePriorityImpact
+    )
+  ),
+  ResolveIssue: withAuth(
+    withRoleAuth(["admin", "superadmin"], issueHandler.resolveIssue)
+  ),
 };
 
 issueServer.addService(issueDef.issue.IssueService.service, handler);

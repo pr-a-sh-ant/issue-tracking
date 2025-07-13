@@ -10,8 +10,12 @@ import type { GetIssueRequest as _issue_GetIssueRequest, GetIssueRequest__Output
 import type { GetIssueResponse as _issue_GetIssueResponse, GetIssueResponse__Output as _issue_GetIssueResponse__Output } from '../issue/GetIssueResponse';
 import type { ListIssuesRequest as _issue_ListIssuesRequest, ListIssuesRequest__Output as _issue_ListIssuesRequest__Output } from '../issue/ListIssuesRequest';
 import type { ListIssuesResponse as _issue_ListIssuesResponse, ListIssuesResponse__Output as _issue_ListIssuesResponse__Output } from '../issue/ListIssuesResponse';
-import type { UpdateIssueRequest as _issue_UpdateIssueRequest, UpdateIssueRequest__Output as _issue_UpdateIssueRequest__Output } from '../issue/UpdateIssueRequest';
-import type { UpdateIssueResponse as _issue_UpdateIssueResponse, UpdateIssueResponse__Output as _issue_UpdateIssueResponse__Output } from '../issue/UpdateIssueResponse';
+import type { ResolveIssueRequest as _issue_ResolveIssueRequest, ResolveIssueRequest__Output as _issue_ResolveIssueRequest__Output } from '../issue/ResolveIssueRequest';
+import type { ResolveIssueResponse as _issue_ResolveIssueResponse, ResolveIssueResponse__Output as _issue_ResolveIssueResponse__Output } from '../issue/ResolveIssueResponse';
+import type { UpdateIssueDetailsRequest as _issue_UpdateIssueDetailsRequest, UpdateIssueDetailsRequest__Output as _issue_UpdateIssueDetailsRequest__Output } from '../issue/UpdateIssueDetailsRequest';
+import type { UpdateIssueDetailsResponse as _issue_UpdateIssueDetailsResponse, UpdateIssueDetailsResponse__Output as _issue_UpdateIssueDetailsResponse__Output } from '../issue/UpdateIssueDetailsResponse';
+import type { UpdateIssuePriorityImpactRequest as _issue_UpdateIssuePriorityImpactRequest, UpdateIssuePriorityImpactRequest__Output as _issue_UpdateIssuePriorityImpactRequest__Output } from '../issue/UpdateIssuePriorityImpactRequest';
+import type { UpdateIssuePriorityImpactResponse as _issue_UpdateIssuePriorityImpactResponse, UpdateIssuePriorityImpactResponse__Output as _issue_UpdateIssuePriorityImpactResponse__Output } from '../issue/UpdateIssuePriorityImpactResponse';
 
 export interface IssueServiceClient extends grpc.Client {
   AssignIssue(argument: _issue_AssignIssueRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_AssignIssueResponse__Output>): grpc.ClientUnaryCall;
@@ -59,14 +63,32 @@ export interface IssueServiceClient extends grpc.Client {
   listIssuesByUser(argument: _issue_ListIssuesRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_ListIssuesResponse__Output>): grpc.ClientUnaryCall;
   listIssuesByUser(argument: _issue_ListIssuesRequest, callback: grpc.requestCallback<_issue_ListIssuesResponse__Output>): grpc.ClientUnaryCall;
   
-  UpdateIssue(argument: _issue_UpdateIssueRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssueResponse__Output>): grpc.ClientUnaryCall;
-  UpdateIssue(argument: _issue_UpdateIssueRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_issue_UpdateIssueResponse__Output>): grpc.ClientUnaryCall;
-  UpdateIssue(argument: _issue_UpdateIssueRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssueResponse__Output>): grpc.ClientUnaryCall;
-  UpdateIssue(argument: _issue_UpdateIssueRequest, callback: grpc.requestCallback<_issue_UpdateIssueResponse__Output>): grpc.ClientUnaryCall;
-  updateIssue(argument: _issue_UpdateIssueRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssueResponse__Output>): grpc.ClientUnaryCall;
-  updateIssue(argument: _issue_UpdateIssueRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_issue_UpdateIssueResponse__Output>): grpc.ClientUnaryCall;
-  updateIssue(argument: _issue_UpdateIssueRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssueResponse__Output>): grpc.ClientUnaryCall;
-  updateIssue(argument: _issue_UpdateIssueRequest, callback: grpc.requestCallback<_issue_UpdateIssueResponse__Output>): grpc.ClientUnaryCall;
+  ResolveIssue(argument: _issue_ResolveIssueRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_ResolveIssueResponse__Output>): grpc.ClientUnaryCall;
+  ResolveIssue(argument: _issue_ResolveIssueRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_issue_ResolveIssueResponse__Output>): grpc.ClientUnaryCall;
+  ResolveIssue(argument: _issue_ResolveIssueRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_ResolveIssueResponse__Output>): grpc.ClientUnaryCall;
+  ResolveIssue(argument: _issue_ResolveIssueRequest, callback: grpc.requestCallback<_issue_ResolveIssueResponse__Output>): grpc.ClientUnaryCall;
+  resolveIssue(argument: _issue_ResolveIssueRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_ResolveIssueResponse__Output>): grpc.ClientUnaryCall;
+  resolveIssue(argument: _issue_ResolveIssueRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_issue_ResolveIssueResponse__Output>): grpc.ClientUnaryCall;
+  resolveIssue(argument: _issue_ResolveIssueRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_ResolveIssueResponse__Output>): grpc.ClientUnaryCall;
+  resolveIssue(argument: _issue_ResolveIssueRequest, callback: grpc.requestCallback<_issue_ResolveIssueResponse__Output>): grpc.ClientUnaryCall;
+  
+  UpdateIssueDetails(argument: _issue_UpdateIssueDetailsRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssueDetailsResponse__Output>): grpc.ClientUnaryCall;
+  UpdateIssueDetails(argument: _issue_UpdateIssueDetailsRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_issue_UpdateIssueDetailsResponse__Output>): grpc.ClientUnaryCall;
+  UpdateIssueDetails(argument: _issue_UpdateIssueDetailsRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssueDetailsResponse__Output>): grpc.ClientUnaryCall;
+  UpdateIssueDetails(argument: _issue_UpdateIssueDetailsRequest, callback: grpc.requestCallback<_issue_UpdateIssueDetailsResponse__Output>): grpc.ClientUnaryCall;
+  updateIssueDetails(argument: _issue_UpdateIssueDetailsRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssueDetailsResponse__Output>): grpc.ClientUnaryCall;
+  updateIssueDetails(argument: _issue_UpdateIssueDetailsRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_issue_UpdateIssueDetailsResponse__Output>): grpc.ClientUnaryCall;
+  updateIssueDetails(argument: _issue_UpdateIssueDetailsRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssueDetailsResponse__Output>): grpc.ClientUnaryCall;
+  updateIssueDetails(argument: _issue_UpdateIssueDetailsRequest, callback: grpc.requestCallback<_issue_UpdateIssueDetailsResponse__Output>): grpc.ClientUnaryCall;
+  
+  UpdateIssuePriorityImpact(argument: _issue_UpdateIssuePriorityImpactRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssuePriorityImpactResponse__Output>): grpc.ClientUnaryCall;
+  UpdateIssuePriorityImpact(argument: _issue_UpdateIssuePriorityImpactRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_issue_UpdateIssuePriorityImpactResponse__Output>): grpc.ClientUnaryCall;
+  UpdateIssuePriorityImpact(argument: _issue_UpdateIssuePriorityImpactRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssuePriorityImpactResponse__Output>): grpc.ClientUnaryCall;
+  UpdateIssuePriorityImpact(argument: _issue_UpdateIssuePriorityImpactRequest, callback: grpc.requestCallback<_issue_UpdateIssuePriorityImpactResponse__Output>): grpc.ClientUnaryCall;
+  updateIssuePriorityImpact(argument: _issue_UpdateIssuePriorityImpactRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssuePriorityImpactResponse__Output>): grpc.ClientUnaryCall;
+  updateIssuePriorityImpact(argument: _issue_UpdateIssuePriorityImpactRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_issue_UpdateIssuePriorityImpactResponse__Output>): grpc.ClientUnaryCall;
+  updateIssuePriorityImpact(argument: _issue_UpdateIssuePriorityImpactRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_issue_UpdateIssuePriorityImpactResponse__Output>): grpc.ClientUnaryCall;
+  updateIssuePriorityImpact(argument: _issue_UpdateIssuePriorityImpactRequest, callback: grpc.requestCallback<_issue_UpdateIssuePriorityImpactResponse__Output>): grpc.ClientUnaryCall;
   
 }
 
@@ -81,7 +103,11 @@ export interface IssueServiceHandlers extends grpc.UntypedServiceImplementation 
   
   ListIssuesByUser: grpc.handleUnaryCall<_issue_ListIssuesRequest__Output, _issue_ListIssuesResponse>;
   
-  UpdateIssue: grpc.handleUnaryCall<_issue_UpdateIssueRequest__Output, _issue_UpdateIssueResponse>;
+  ResolveIssue: grpc.handleUnaryCall<_issue_ResolveIssueRequest__Output, _issue_ResolveIssueResponse>;
+  
+  UpdateIssueDetails: grpc.handleUnaryCall<_issue_UpdateIssueDetailsRequest__Output, _issue_UpdateIssueDetailsResponse>;
+  
+  UpdateIssuePriorityImpact: grpc.handleUnaryCall<_issue_UpdateIssuePriorityImpactRequest__Output, _issue_UpdateIssuePriorityImpactResponse>;
   
 }
 
@@ -91,5 +117,7 @@ export interface IssueServiceDefinition extends grpc.ServiceDefinition {
   GetIssue: MethodDefinition<_issue_GetIssueRequest, _issue_GetIssueResponse, _issue_GetIssueRequest__Output, _issue_GetIssueResponse__Output>
   ListIssues: MethodDefinition<_issue_ListIssuesRequest, _issue_ListIssuesResponse, _issue_ListIssuesRequest__Output, _issue_ListIssuesResponse__Output>
   ListIssuesByUser: MethodDefinition<_issue_ListIssuesRequest, _issue_ListIssuesResponse, _issue_ListIssuesRequest__Output, _issue_ListIssuesResponse__Output>
-  UpdateIssue: MethodDefinition<_issue_UpdateIssueRequest, _issue_UpdateIssueResponse, _issue_UpdateIssueRequest__Output, _issue_UpdateIssueResponse__Output>
+  ResolveIssue: MethodDefinition<_issue_ResolveIssueRequest, _issue_ResolveIssueResponse, _issue_ResolveIssueRequest__Output, _issue_ResolveIssueResponse__Output>
+  UpdateIssueDetails: MethodDefinition<_issue_UpdateIssueDetailsRequest, _issue_UpdateIssueDetailsResponse, _issue_UpdateIssueDetailsRequest__Output, _issue_UpdateIssueDetailsResponse__Output>
+  UpdateIssuePriorityImpact: MethodDefinition<_issue_UpdateIssuePriorityImpactRequest, _issue_UpdateIssuePriorityImpactResponse, _issue_UpdateIssuePriorityImpactRequest__Output, _issue_UpdateIssuePriorityImpactResponse__Output>
 }

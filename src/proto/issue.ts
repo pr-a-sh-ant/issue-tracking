@@ -21,9 +21,13 @@ export interface ProtoGrpcType {
     IssueShort: MessageTypeDefinition
     ListIssuesRequest: MessageTypeDefinition
     ListIssuesResponse: MessageTypeDefinition
+    ResolveIssueRequest: MessageTypeDefinition
+    ResolveIssueResponse: MessageTypeDefinition
     StatusEnum: EnumTypeDefinition
-    UpdateIssueRequest: MessageTypeDefinition
-    UpdateIssueResponse: MessageTypeDefinition
+    UpdateIssueDetailsRequest: MessageTypeDefinition
+    UpdateIssueDetailsResponse: MessageTypeDefinition
+    UpdateIssuePriorityImpactRequest: MessageTypeDefinition
+    UpdateIssuePriorityImpactResponse: MessageTypeDefinition
     UrgencyEnum: EnumTypeDefinition
   }
 }

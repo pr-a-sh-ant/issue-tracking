@@ -5,7 +5,6 @@ export const StatusEnum = {
   ACK: 1,
   RESOLVED: 2,
   CLOSED: 3,
-  PENDING: 4,
 } as const;
 
 export type StatusEnum =
@@ -17,7 +16,5 @@ export type StatusEnum =
   | 2
   | 'CLOSED'
   | 3
-  | 'PENDING'
-  | 4
 
 export type StatusEnum__Output = typeof StatusEnum[keyof typeof StatusEnum]

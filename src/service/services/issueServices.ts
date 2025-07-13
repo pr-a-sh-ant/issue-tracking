@@ -9,8 +9,12 @@ import { AssignIssueRequest } from "src/proto/issue/AssignIssueRequest";
 import { AssignIssueResponse } from "src/proto/issue/AssignIssueResponse";
 import { ListIssuesRequest } from "src/proto/issue/ListIssuesRequest";
 import { ListIssuesResponse } from "src/proto/issue/ListIssuesResponse";
-import { UpdateIssueRequest } from "src/proto/issue/UpdateIssueRequest";
-import { UpdateIssueResponse } from "src/proto/issue/UpdateIssueResponse";
+import { UpdateIssueDetailsRequest } from "src/proto/issue/UpdateIssueDetailsRequest";
+import { UpdateIssueDetailsResponse } from "src/proto/issue/UpdateIssueDetailsResponse";
+import { UpdateIssuePriorityImpactRequest } from "src/proto/issue/UpdateIssuePriorityImpactRequest";
+import { UpdateIssuePriorityImpactResponse } from "src/proto/issue/UpdateIssuePriorityImpactResponse";
+import { ResolveIssueRequest } from "src/proto/issue/ResolveIssueRequest";
+import { ResolveIssueResponse } from "src/proto/issue/ResolveIssueResponse";
 
 // Creating helper function and model
 import issueModel from "../model/issueModel";
@@ -156,23 +160,94 @@ const listIssuesByUser = async (
   }
 };
 
-const updateIssue = async (
-  call: ServerUnaryCall<UpdateIssueRequest, UpdateIssueResponse>,
-  callback: sendUnaryData<UpdateIssueResponse>
+const updateIssueDetails = async (
+  call: ServerUnaryCall<UpdateIssueDetailsRequest, UpdateIssueDetailsResponse>,
+  callback: sendUnaryData<UpdateIssueDetailsResponse>
 ) => {
-  callback({
-    code: status.UNIMPLEMENTED,
-    message: "UpdateIssue is not implemented yet",
-  });
+  try {
+    const { description, issueId } = call.request;
+    // @ts-ignore
+    const userId = call.user?.userId;
+    const result = await issueModel.updateIssueDetails(
+      parseInt(issueId),
+      description,
+      userId
+    );
+    callback(null, {
+      message: result.message || "Issue details updated successfully",
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      message:
+        error.message || "Internal server error while updating issue details",
+    });
+  }
+};
+
+const updateIssuePriorityImpact = async (
+  call: ServerUnaryCall<
+    UpdateIssuePriorityImpactRequest,
+    UpdateIssuePriorityImpactResponse
+  >,
+  callback: sendUnaryData<UpdateIssuePriorityImpactResponse>
+) => {
+  try {
+    const { impact, issueId, priority, urgency } = call.request;
+    const result = await issueModel.updateIssuePriorityImpact(
+      parseInt(issueId),
+      priority,
+      impact,
+      urgency
+    );
+    callback(null, {
+      message:
+        result.message || "Issue priority and impact updated successfully",
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      message:
+        error.message ||
+        "Internal server error while updating issue priority and impact",
+    });
+  }
+};
+
+const resolveIssue = async (
+  call: ServerUnaryCall<ResolveIssueRequest, ResolveIssueResponse>,
+  callback: sendUnaryData<ResolveIssueResponse>
+) => {
+  try {
+    const { issueId, resolution } = call.request;
+    // @ts-ignore
+    const userId = call.user?.userId;
+
+    const result = await issueModel.resolveIssue(
+      parseInt(issueId),
+      resolution,
+      userId
+    );
+    callback(null, {
+      message: result.message || "Issue resolved successfully",
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      message: error.message || "Internal server error while resolving issue",
+    });
+  }
 };
 
 const issueHandler = {
-  updateIssue,
+  resolveIssue,
+  assignIssue,
+  updateIssuePriorityImpact,
   createIssue,
   getIssue,
-  assignIssue,
   listIssues,
   listIssuesByUser,
+  updateIssueDetails,
 };
 
 export default issueHandler;

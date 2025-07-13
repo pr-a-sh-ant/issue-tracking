@@ -67,7 +67,7 @@ const assignIssue = async (issueId: number, adminId: number) => {
 
     // Assign the issue
     const sql = mysql2.format(
-      "UPDATE issues SET admin_id = ? WHERE issue_id = ?",
+      "UPDATE issues SET status='ACK', admin_id = ? WHERE issue_id = ?",
       [adminId, issueId]
     );
     const [result] = await pool.query<RowDataPacket[]>(sql);
@@ -110,7 +110,82 @@ const listAllIssues = async (page: number, limit: number) => {
   }
 };
 
+const updateIssueDetails = async (
+  issueId: number,
+  description: string,
+  user_id: number
+) => {
+  try {
+    const sql = mysql2.format(
+      "UPDATE issues SET description = ?, updated_at = NOW() WHERE issue_id = ? AND created_by = ?",
+      [description, issueId, user_id]
+    );
+    const [result] = await pool.query<RowDataPacket[]>(sql);
+    const affectedRows = (result as OkPacketParams).affectedRows;
+    if (affectedRows === 0) {
+      throw new Error(
+        "Issue not found or you do not have permission to update it"
+      );
+    }
+    return { message: "Issue updated successfully" };
+  } catch (error: any) {
+    throw new Error(`Error updating issue details: ${error.message}`);
+  }
+};
+
+const updateIssuePriorityImpact = async (
+  issueId: number,
+  priority: string,
+  impact: string | number,
+  urgency: string | number
+) => {
+  try {
+    const sql = mysql2.format(
+      "UPDATE issues SET priority = ?, impact = ?, urgency = ?, updated_at = NOW() WHERE issue_id = ?",
+      [priority, impact, urgency, issueId]
+    );
+    const [result] = await pool.query<RowDataPacket[]>(sql);
+    const affectedRows = (result as OkPacketParams).affectedRows;
+    if (affectedRows === 0) {
+      throw new Error(
+        "Issue not found or you do not have permission to update it"
+      );
+    }
+    return { message: "Issue priority and impact updated successfully" };
+  } catch (error: any) {
+    throw new Error(
+      `Error updating issue priority and impact: ${error.message}`
+    );
+  }
+};
+
+const resolveIssue = async (
+  issueId: number,
+  resolution: string | number,
+  adminId: string
+) => {
+  try {
+    const sql = mysql2.format(
+      "UPDATE issues SET status = ?, updated_at = NOW() WHERE issue_id = ? and admin_id = ?",
+      [resolution, issueId, adminId]
+    );
+    const [result] = await pool.query<RowDataPacket[]>(sql);
+    const affectedRows = (result as OkPacketParams).affectedRows;
+    if (affectedRows === 0) {
+      throw new Error(
+        "Issue not found or you do not have permission to resolve it"
+      );
+    }
+    return { message: "Issue resolved successfully" };
+  } catch (error: any) {
+    throw new Error(`Error resolving issue: ${error.message}`);
+  }
+};
+
 const issueModel = {
+  resolveIssue,
+  updateIssuePriorityImpact,
+  updateIssueDetails,
   createIssue,
   getIssue,
   assignIssue,
