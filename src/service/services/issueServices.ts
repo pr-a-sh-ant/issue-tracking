@@ -61,13 +61,13 @@ const getIssue = async (
       });
     }
 
-    const issue = await issueModel.getIssue(
+    const issueResult = await issueModel.getIssue(
       parseInt(issueId),
       user?.role,
       user?.userId
     );
 
-    if (!issue) {
+    if (!issueResult) {
       return callback({
         code: status.NOT_FOUND,
         message: "Issue not found",
@@ -75,7 +75,8 @@ const getIssue = async (
     }
     callback(null, {
       message: "Issue retrieved successfully",
-      Issue: issue,
+      Issue: issueResult.issue,
+      comments: issueResult.comments,
     });
   } catch (error: any) {
     callback({

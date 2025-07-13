@@ -1,7 +1,8 @@
 import pool from "../../db/db";
 import mysql2, { RowDataPacket, OkPacketParams } from "mysql2/promise";
-import { CreateIssueRequest } from "src/proto/issue/CreateIssueRequest";
+import { CreateIssueRequest } from "../../proto/issue/CreateIssueRequest";
 import { Issue } from "../../proto/issue/Issue";
+import { Comment } from "../../proto/issue/Comment";
 
 interface CreateIssueRequestwithUserId extends CreateIssueRequest {
   created_by: number;
@@ -44,7 +45,17 @@ const getIssue = async (issueId: number, role: string, userId: number) => {
     if (!isAdmin && rows[0].id !== userId) {
       throw new Error("You do not have permission to view this issue");
     }
-    return rows[0] as Issue;
+
+    const commentSql = mysql2.format(
+      "SELECT c.id, c.content, u.name as user_name, c.created_at FROM comment c INNER JOIN users u ON c.user_id = u.id WHERE c.issue_id = ?",
+      [issueId]
+    );
+    const [commentRows] = await pool.query<RowDataPacket[]>(commentSql);
+
+    return {
+      issue: rows[0] as Issue,
+      comments: commentRows as Comment[],
+    };
   } catch (error: any) {
     throw new Error(`Error fetching issue: ${error.message}`);
   }
@@ -52,7 +63,7 @@ const getIssue = async (issueId: number, role: string, userId: number) => {
 
 const assignIssue = async (issueId: number, adminId: number) => {
   try {
-    // First, check if the issue is already assigned
+    // check if the issue is already assigned
     const checkSql = mysql2.format(
       "SELECT admin_id FROM issues WHERE issue_id = ?",
       [issueId]

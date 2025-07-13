@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import authRouter from "./routes/authRoutes";
 import issueRouter from "./routes/issueRoutes";
+import commentRouter from "./routes/commentRouter";
 
 const userApp = express();
 const issueApp = express();
@@ -15,6 +16,7 @@ issueApp.use(cors());
 
 userApp.use("/api/v1/auth", authRouter);
 issueApp.use("/api/v1/issue", issueRouter);
+issueApp.use("/api/v1/comment", commentRouter);
 
 userApp.listen(3000, () => {
   console.log("User Client is running on http://localhost:3000");

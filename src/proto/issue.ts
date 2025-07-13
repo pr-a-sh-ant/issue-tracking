@@ -11,6 +11,7 @@ export interface ProtoGrpcType {
   issue: {
     AssignIssueRequest: MessageTypeDefinition
     AssignIssueResponse: MessageTypeDefinition
+    Comment: MessageTypeDefinition
     CreateIssueRequest: MessageTypeDefinition
     CreateIssueResponse: MessageTypeDefinition
     GetIssueRequest: MessageTypeDefinition

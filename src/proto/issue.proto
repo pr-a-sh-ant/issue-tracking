@@ -50,7 +50,15 @@ message GetIssueRequest {
 
 message GetIssueResponse {
     Issue Issue = 1;
-    string message = 2;
+    repeated Comment comments = 2;
+    string message = 3;
+}
+
+message Comment {
+    string id = 1;
+    string content = 3;
+    string user_name = 4;
+    string created_at = 5;
 }
 
 message Issue {
