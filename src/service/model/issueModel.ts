@@ -77,11 +77,15 @@ const assignIssue = async (issueId: number, adminId: number) => {
   }
 };
 
-const listIssuesByUser = async (userId: number) => {
+const listIssuesByUser = async (
+  userId: number,
+  page: number,
+  limit: number
+) => {
   try {
     const sql = mysql2.format(
-      "SELECT i.issue_id, i.title, i.status,i.impact, u.name as created_by, i.admin_id, i.created_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id where i.created_by = ?",
-      [userId]
+      "SELECT i.issue_id, i.title, i.status,i.impact, u.name as created_by, i.admin_id, i.created_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id where i.created_by = ? LIMIT ? OFFSET ?",
+      [userId, limit, (page - 1) * limit]
     );
     const [rows] = await pool.query<RowDataPacket[]>(sql);
     if (rows.length === 0) {
@@ -93,9 +97,12 @@ const listIssuesByUser = async (userId: number) => {
   }
 };
 
-const listAllIssues = async () => {
+const listAllIssues = async (page: number, limit: number) => {
   try {
-    const sql = `SELECT i.issue_id, i.title, i.status, i.impact, u.name as created_by, i.admin_id, i.created_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id`;
+    const sql = mysql2.format(
+      "SELECT i.issue_id, i.title, i.status, i.impact, u.name as created_by, i.admin_id, i.created_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id LIMIT ? OFFSET ?",
+      [limit, (page - 1) * limit]
+    );
     const [rows] = await pool.query<RowDataPacket[]>(sql);
     return rows as Issue[];
   } catch (error: any) {

@@ -82,7 +82,10 @@ message Issue {
     string priority = 11;
 }
 
-message ListIssuesRequest{}
+message ListIssuesRequest{
+    string page = 1;
+    string limit = 2;
+}
 
 message IssueShort {
     string issue_id = 1;

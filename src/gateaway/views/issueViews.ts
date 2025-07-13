@@ -1,18 +1,17 @@
 import { issueClient } from "../client";
-import { Request, Response } from "express";
-import { Metadata } from "@grpc/grpc-js";
+import { Response } from "express";
+import { RequestWithMetadata } from "../middleware/setMetadata";
 
-const createIssue = async (req: Request, res: Response) => {
+const createIssue = async (req: RequestWithMetadata, res: Response) => {
   try {
     const { title, description, impact, urgency } = req.body;
     if (!title || !description || !urgency || !impact) {
       return res.status(400).json({ error: "All fields are required" });
     }
-    const metadata = new Metadata();
-    metadata.add("authorization", req.headers.authorization || "");
+
     issueClient.CreateIssue(
       { description, impact, title, urgency },
-      metadata,
+      req.metadata,
       (error, response) => {
         if (error) {
           return res
@@ -30,15 +29,13 @@ const createIssue = async (req: Request, res: Response) => {
   }
 };
 
-const getIssue = async (req: Request, res: Response) => {
+const getIssue = async (req: RequestWithMetadata, res: Response) => {
   try {
     const { issueId } = req.params;
     if (!issueId) {
       return res.status(400).json({ error: "Issue ID is required" });
     }
-    const metadata = new Metadata();
-    metadata.add("authorization", req.headers.authorization || "");
-    issueClient.GetIssue({ issueId }, metadata, (error, response) => {
+    issueClient.GetIssue({ issueId }, req.metadata, (error, response) => {
       if (error) {
         return res
           .status(500)
@@ -51,40 +48,76 @@ const getIssue = async (req: Request, res: Response) => {
   }
 };
 
-const listIssues = async (req: Request, res: Response) => {
+const listIssues = async (req: RequestWithMetadata, res: Response) => {
   try {
-    const metadata = new Metadata();
-    metadata.add("authorization", req.headers.authorization || "");
-    issueClient.ListIssuesByUser({}, metadata, (error, response) => {
-      if (error) {
-        return res
-          .status(500)
-          .json({ error: error.message || "Internal Server Error" });
+    const { page, limit } = req.body || { page: 1, limit: 10 };
+    issueClient.ListIssuesByUser(
+      {
+        page,
+        limit,
+      },
+      req.metadata,
+      (error, response) => {
+        if (error) {
+          return res
+            .status(500)
+            .json({ error: error.message || "Internal Server Error" });
+        }
+        res.status(200).json(response);
       }
-      res.status(200).json(response);
-    });
+    );
   } catch (error: any) {
     res.status(500).json({ error: error.message || "Internal Server Error" });
   }
 };
 
-const getAllIssues = async (req: Request, res: Response) => {
+const getAllIssues = async (req: RequestWithMetadata, res: Response) => {
   try {
-    const metadata = new Metadata();
-    metadata.add("authorization", req.headers.authorization || "");
-    issueClient.ListIssues({}, metadata, (error, response) => {
+    const { page, limit } = req.body || { page: 1, limit: 10 };
+
+    issueClient.ListIssues(
+      { page: page.toString(), limit: limit.toString() },
+      req.metadata,
+      (error, response) => {
+        if (error) {
+          return res
+            .status(500)
+            .json({ error: error.message || "Internal Server Error" });
+        }
+        res.status(200).json(response);
+      }
+    );
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || "Internal Server Error" });
+  }
+};
+
+const assignIssue = async (req: RequestWithMetadata, res: Response) => {
+  try {
+    const { issueId } = req.params;
+    issueClient.AssignIssue({ issueId }, req.metadata, (error, response) => {
       if (error) {
         return res
           .status(500)
           .json({ error: error.message || "Internal Server Error" });
       }
-      res.status(200).json(response);
+      res.status(200).json({
+        message: response.message,
+        status: response.status,
+        issueId: response.issueId,
+      });
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message || "Internal Server Error" });
   }
 };
 
-const issueViews = { createIssue, getIssue, listIssues, getAllIssues };
+const issueViews = {
+  createIssue,
+  getIssue,
+  listIssues,
+  getAllIssues,
+  assignIssue,
+};
 
 export default issueViews;

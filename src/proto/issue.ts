@@ -18,6 +18,7 @@ export interface ProtoGrpcType {
     ImpactEnum: EnumTypeDefinition
     Issue: MessageTypeDefinition
     IssueService: SubtypeConstructor<typeof grpc.Client, _issue_IssueServiceClient> & { service: _issue_IssueServiceDefinition }
+    IssueShort: MessageTypeDefinition
     ListIssuesRequest: MessageTypeDefinition
     ListIssuesResponse: MessageTypeDefinition
     StatusEnum: EnumTypeDefinition

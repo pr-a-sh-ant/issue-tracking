@@ -14,6 +14,7 @@ import { UpdateIssueResponse } from "src/proto/issue/UpdateIssueResponse";
 
 // Creating helper function and model
 import issueModel from "../model/issueModel";
+import { parse } from "path";
 
 const createIssue = async (
   call: ServerUnaryCall<CreateIssueRequest, CreateIssueResponse>,
@@ -113,7 +114,11 @@ const listIssues = async (
   callback: sendUnaryData<ListIssuesResponse>
 ) => {
   try {
-    const result = await issueModel.listAllIssues();
+    const { page, limit } = call.request;
+    const result = await issueModel.listAllIssues(
+      parseInt(page),
+      parseInt(limit)
+    );
     callback(null, {
       message: "All issues retrieved successfully",
       issues: result,
@@ -133,7 +138,12 @@ const listIssuesByUser = async (
   try {
     //@ts-ignore
     const userId = call.user?.userId;
-    const result = await issueModel.listIssuesByUser(userId);
+    const { page, limit } = call.request;
+    const result = await issueModel.listIssuesByUser(
+      userId,
+      parseInt(page),
+      parseInt(limit)
+    );
     callback(null, {
       message: "Issues listed successfully",
       issues: result,
