@@ -9,8 +9,6 @@
     "start:seed": "npx sequelize-cli db:seed:all",
     "seed:undo": "npx sequelize-cli db:seed:undo",
     "build": "rimraf dist && npx tsc",
-    "prestart": "npm run build",
-    "start": "node dist/server.js",
     "preserver": "npm run build",
     "generate:proto": "node_modules/.bin/proto-loader-gen-types -I=src/proto src/proto/*proto --outDir=src/proto/ src/proto/*.proto --grpcLib=@grpc/grpc-js",
     "proto:watch": "chokidar 'src/proto/*.proto' -c 'npm run generate:proto'",
