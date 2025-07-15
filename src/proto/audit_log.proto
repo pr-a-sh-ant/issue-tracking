@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package auditlog;
+
+service AuditLogService {
+  rpc GetLogEvents(LogEventRequest) returns (LogEventResponse);
+}
+
+message LogEventRequest {
+  string page = 1;
+  string limit = 2;
+}
+
+message LogEventResponse {
+  repeated LogEvent log_events = 1;
+}
+
+message LogEvent {
+  string log_id = 1;
+  string name = 2;
+  string action = 3;
+  string issue_id = 4;
+  string log_date = 5;
+  string details = 6; 
+}
+

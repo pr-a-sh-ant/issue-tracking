@@ -5,3 +5,6 @@
 /config
 
 /dist
+
+src/proto/**/*.ts
+src/proto/**/
