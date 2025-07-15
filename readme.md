@@ -10,6 +10,9 @@ A Node.js-based issue tracking system using TypeScript, MySQL, Redis, gRPC, and 
 - Database migrations and seeders (via Sequelize)
 - Environment variable management with dotenv
 
+You can find the complete API documentation at:
+[Issue Tracking API Documentation](https://documenter.getpostman.com/view/30979139/2sB34hGffD)
+
 ## Prerequisites
 
 - Node.js (v18+ recommended)
