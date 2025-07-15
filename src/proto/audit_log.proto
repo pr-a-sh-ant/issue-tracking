@@ -12,7 +12,7 @@ message LogEventRequest {
 }
 
 message LogEventResponse {
-  repeated LogEvent log_events = 1;
+  repeated LogEvent logEvents = 1;
 }
 
 message LogEvent {

@@ -16,7 +16,6 @@ const getLogEvents = async (
       parseInt(page) || 1,
       parseInt(limit) || 10
     );
-    console.log("Fetched log events:", result);
     callback(null, {
       logEvents: result,
     });

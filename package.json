@@ -15,7 +15,7 @@
     "generate:proto": "node_modules/.bin/proto-loader-gen-types -I=src/proto src/proto/*proto --outDir=src/proto/ src/proto/*.proto --grpcLib=@grpc/grpc-js",
     "proto:watch": "chokidar 'src/proto/*.proto' -c 'npm run generate:proto'",
     "serve": "concurrently \"npx tsc -w\" \"nodemon dist/service/index.js\"",
-    "serve:gateway": "concurrently \"npx tsc -w\" \"nodemon dist/gateaway/index.js\""
+    "serve:gateway": "concurrently \"npx tsc -w\" \"nodemon dist/gateway/index.js\""
   },
   "author": "",
   "license": "ISC",

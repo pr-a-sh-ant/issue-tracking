@@ -4,6 +4,7 @@ import cors from "cors";
 import authRouter from "./routes/authRoutes";
 import issueRouter from "./routes/issueRoutes";
 import commentRouter from "./routes/commentRouter";
+import auditLogRouter from "./routes/auditLogRoutes";
 
 const userApp = express();
 const issueApp = express();
@@ -17,6 +18,7 @@ issueApp.use(cors());
 userApp.use("/api/v1/auth", authRouter);
 issueApp.use("/api/v1/issue", issueRouter);
 issueApp.use("/api/v1/comment", commentRouter);
+issueApp.use("/api/v1/logs", auditLogRouter);
 
 userApp.listen(3000, () => {
   console.log("User Client is running on http://localhost:3000");

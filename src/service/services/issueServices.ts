@@ -18,7 +18,10 @@ import { ResolveIssueResponse } from "src/proto/issue/ResolveIssueResponse";
 
 // Creating helper function and model
 import issueModel from "../model/issueModel";
-import { parse } from "path";
+import auditlogModel from "../model/auditlogModel";
+
+// importing types
+import { LogEventTable } from "../model/auditlogModel";
 
 const createIssue = async (
   call: ServerUnaryCall<CreateIssueRequest, CreateIssueResponse>,
@@ -34,6 +37,14 @@ const createIssue = async (
       created_at: new Date(),
       updated_at: new Date(),
     });
+    const logDetail: LogEventTable = {
+      action: "CREATE_ISSUE",
+      details: `Issue created with title: ${issue.title}`,
+      issue_id: result.insertId,
+      log_date: new Date(),
+      user_id: created_by,
+    };
+    await auditlogModel.createAuditLogEvent(logDetail);
     callback(null, {
       message: "Issue created successfully",
       issueId: result.insertId.toString(),
@@ -101,6 +112,14 @@ const assignIssue = async (
       });
     }
     const result = await issueModel.assignIssue(parseInt(issueId), adminId);
+    const logDetail: LogEventTable = {
+      action: "ASSIGN_ISSUE",
+      details: `Issue with ID ${issueId} assigned by admin ${adminId}`,
+      issue_id: parseInt(issueId),
+      log_date: new Date(),
+      user_id: adminId,
+    };
+    await auditlogModel.createAuditLogEvent(logDetail);
     callback(null, {
       message: result.message || "Issue assigned successfully",
       status: status.OK.toString(),
@@ -195,12 +214,22 @@ const updateIssuePriorityImpact = async (
 ) => {
   try {
     const { impact, issueId, priority, urgency } = call.request;
+    // @ts-ignore
+    const adminId = call.user?.userId;
     const result = await issueModel.updateIssuePriorityImpact(
       parseInt(issueId),
       priority,
       impact,
       urgency
     );
+    const logDetail: LogEventTable = {
+      action: "UPDATE_PRIORITY_IMPACT",
+      details: `Issue with ID ${issueId} updated with priority: ${priority}, impact: ${impact}, urgency: ${urgency}`,
+      issue_id: parseInt(issueId),
+      log_date: new Date(),
+      user_id: adminId,
+    };
+    await auditlogModel.createAuditLogEvent(logDetail);
     callback(null, {
       message:
         result.message || "Issue priority and impact updated successfully",
@@ -229,6 +258,14 @@ const resolveIssue = async (
       resolution,
       userId
     );
+    const logDetail: LogEventTable = {
+      action: "RESOLVE_ISSUE",
+      details: `Issue with ID ${issueId} resolved with resolution: ${resolution}`,
+      issue_id: parseInt(issueId),
+      log_date: new Date(),
+      user_id: userId,
+    };
+    await auditlogModel.createAuditLogEvent(logDetail);
     callback(null, {
       message: result.message || "Issue resolved successfully",
     });

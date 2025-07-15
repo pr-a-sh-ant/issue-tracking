@@ -32,7 +32,7 @@ const createIssue = async (
 
 const getIssue = async (issueId: number, role: string, userId: number) => {
   try {
-    const isAdmin = role === "admin";
+    const isAdmin = role === "admin" || role === "superadmin";
     const sql = mysql2.format(
       "SELECT i.issue_id, i.title, i.description, i.status, i.urgency, i.impact, u.name as created_by, i.admin_id, i.created_at, i.updated_at, u.id, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id WHERE issue_id = ?",
       [issueId]
