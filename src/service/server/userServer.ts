@@ -23,11 +23,15 @@ const userDef = loadPackageDefinition(
 const userServer = new Server();
 
 const handler: UserServiceHandlers = {
-  LoginUser: userHandler.LoginUser,
+  LoginUser: userHandler.LoginRequest,
   RegisterUser: userHandler.RegisterUser,
   CreateAdminUser: withAuth(
-    withRoleAuth(["superadmin"], userHandler.CreateAdminUser)
+    withRoleAuth(["superadmin"], userHandler.AdminRegisterUser)
   ),
+  ForgetPassword: userHandler.forgetPassword,
+  ResetPassword: withAuth(userHandler.resetPassword),
+  SendOTP: userHandler.sendOTP,
+  verifyOTP: userHandler.verifyOTP,
 };
 
 userServer.addService(userDef.user.UserService.service, handler);

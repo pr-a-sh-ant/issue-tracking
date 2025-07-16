@@ -11,6 +11,36 @@ service IssueService {
     rpc UpdateIssueDetails (UpdateIssueDetailsRequest) returns (UpdateIssueDetailsResponse);
     rpc UpdateIssuePriorityImpact (UpdateIssuePriorityImpactRequest) returns (UpdateIssuePriorityImpactResponse);
     rpc ResolveIssue (ResolveIssueRequest) returns (ResolveIssueResponse);
+    rpc UploadAttachment(UploadAttachmentRequest) returns (UploadAttachmentResponse);
+}
+
+message UploadAttachmentRequest {
+    string file_name = 1;
+    string file_path = 2;
+    string issue_id = 3;
+    string created_by = 4;
+}
+
+message UploadAttachmentResponse {
+    string message = 1;
+}
+
+message ListAttachmentsRequest {
+    string issue_id = 1;
+}
+
+message ListAttachmentsResponse {
+    repeated Attachment attachments = 1;
+    string message = 2;
+}
+
+message Attachment {
+    string id = 1;
+    string file_name = 2;
+    string file_path = 3;
+    string created_by = 4;
+    string created_at = 5;
+    string issue_id = 6;
 }
 
 enum StatusEnum {
@@ -51,14 +81,16 @@ message GetIssueRequest {
 message GetIssueResponse {
     Issue Issue = 1;
     repeated Comment comments = 2;
-    string message = 3;
+    repeated Attachment attachments = 3;
+    string message = 4;
 }
 
 message Comment {
     string id = 1;
     string content = 3;
-    string user_name = 4;
-    string created_at = 5;
+    string userName = 4;
+    string parentId = 5;
+    string created_at = 6;
 }
 
 message Issue {

@@ -1,8 +1,11 @@
 import express from "express";
 import issueViews from "../views/issueViews";
 import setMetadata from "../middleware/setMetadata";
+import multer from "multer";
 
 const issueRouter = express.Router();
+
+const upload = multer({ dest: "uploads/" });
 
 issueRouter.use(setMetadata);
 
@@ -17,5 +20,11 @@ issueRouter.patch(
   issueViews.updateIssuePriorityImpact
 );
 issueRouter.post("/resolve-issue/:issueId", issueViews.resolveIssue);
+
+issueRouter.post(
+  "/upload/:issueId",
+  upload.single("file"),
+  issueViews.uploadFile
+);
 
 export default issueRouter;

@@ -9,6 +9,7 @@ service CommentService {
 message CreateCommentRequest {
     string issueId = 1;
   string content = 2;
+  string parentId = 3;
 }
 
 message CreateCommentResponse {

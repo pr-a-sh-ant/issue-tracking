@@ -77,6 +77,84 @@ const RegisterUser = async (data: RegisterRequest, role: string = "user") => {
   }
 };
 
-const UserModel = { LoginUser, RegisterUser };
+const verifyUser = async (email: string | null, phone: string | null) => {
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      "SELECT id FROM users WHERE email = ? OR phone = ?",
+      [email, phone]
+    );
+    if (rows.length === 0) {
+      throw new Error("User not found");
+    }
+    return rows[0] as { userID: number };
+  } catch (error: any) {
+    throw new Error(error.message || "Database error");
+  }
+};
+
+const forgetPassword = async (
+  password: string,
+  email: string,
+  phone: string
+) => {
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const [result] = await pool.query<RowDataPacket[]>(
+      "UPDATE users SET password = ? WHERE email = ? OR phone = ?",
+      [hashedPassword, email, phone]
+    );
+    const affectedRows = (result as OkPacketParams).affectedRows;
+    if (affectedRows === 0) {
+      throw new Error("User not found or no changes made");
+    }
+    return { message: "Password updated successfully" };
+  } catch (error: any) {
+    throw new Error(error.message || "Database error");
+  }
+};
+
+const resetPassword = async (
+  userId: number,
+  currentPassword: string,
+  newPassword: string
+) => {
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      "SELECT  u.password, u.role FROM users as u WHERE id = ?",
+      [userId]
+    );
+    if (rows.length === 0) {
+      throw new Error("User not found");
+    }
+    const user = rows[0] as User;
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+    if (!isPasswordValid) {
+      throw new Error("Invalid credentials");
+    }
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    const [result] = await pool.query<RowDataPacket[]>(
+      "UPDATE users SET password = ? WHERE id = ?",
+      [hashedNewPassword, userId]
+    );
+    const affectedRows = (result as OkPacketParams).affectedRows;
+    if (affectedRows === 0) {
+      throw new Error("User not found or no changes made");
+    }
+    return { message: "Password reset successfully" };
+  } catch (error: any) {
+    throw new Error(error.message || "Database error");
+  }
+};
+
+const UserModel = {
+  LoginUser,
+  RegisterUser,
+  verifyUser,
+  forgetPassword,
+  resetPassword,
+};
 
 export default UserModel;

@@ -80,6 +80,7 @@ const handler: IssueServiceHandlers = {
   ResolveIssue: withAuth(
     withRoleAuth(["admin", "superadmin"], issueHandler.resolveIssue)
   ),
+  UploadAttachment: withAuth(issueHandler.uploadAttachment),
 };
 
 const commentHandlerService: CommentServiceHandlers = {

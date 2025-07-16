@@ -54,5 +54,6 @@ export default {
      * Example:
      * await queryInterface.dropTable('users');
      */
+    await queryInterface.dropTable("audit_logs");
   },
 };

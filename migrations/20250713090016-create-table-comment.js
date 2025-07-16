@@ -1,7 +1,7 @@
 "use strict";
 
 /** @type {import('sequelize-cli').Migration} */
-module.exports = {
+export default {
   async up(queryInterface, Sequelize) {
     /**
      * Add altering commands here.
@@ -29,6 +29,14 @@ module.exports = {
         allowNull: false,
         references: {
           model: "users",
+          key: "id",
+        },
+      },
+      parent_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: "comment",
           key: "id",
         },
       },

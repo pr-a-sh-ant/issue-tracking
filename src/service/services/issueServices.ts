@@ -15,6 +15,8 @@ import { UpdateIssuePriorityImpactRequest } from "src/proto/issue/UpdateIssuePri
 import { UpdateIssuePriorityImpactResponse } from "src/proto/issue/UpdateIssuePriorityImpactResponse";
 import { ResolveIssueRequest } from "src/proto/issue/ResolveIssueRequest";
 import { ResolveIssueResponse } from "src/proto/issue/ResolveIssueResponse";
+import { UploadAttachmentRequest } from "src/proto/issue/UploadAttachmentRequest";
+import { UploadAttachmentResponse } from "src/proto/issue/UploadAttachmentResponse";
 
 // Creating helper function and model
 import issueModel from "../model/issueModel";
@@ -277,6 +279,21 @@ const resolveIssue = async (
   }
 };
 
+const uploadAttachment = async (
+  call: ServerUnaryCall<UploadAttachmentRequest, UpdateIssueDetailsResponse>,
+  callback: sendUnaryData<UploadAttachmentResponse>
+) => {
+  try {
+    const { fileName, filePath, issueId, createdBy } = call.request;
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      message:
+        error.message || "Internal server error while uploading attachment",
+    });
+  }
+};
+
 const issueHandler = {
   resolveIssue,
   assignIssue,
@@ -286,6 +303,7 @@ const issueHandler = {
   listIssues,
   listIssuesByUser,
   updateIssueDetails,
+  uploadAttachment,
 };
 
 export default issueHandler;

@@ -6,6 +6,49 @@ service UserService {
   rpc RegisterUser(RegisterRequest) returns (RegisterResponse);
   rpc LoginUser(LoginRequest) returns (LoginResponse);
   rpc CreateAdminUser(RegisterRequest) returns (AdminRegisterResponse);
+  rpc SendOTP(SendOTPRequest) returns (SendOTPResponse);
+  rpc verifyOTP(VerifyOTPRequest) returns (VerifyOTPResponse);
+  rpc ForgetPassword(ForgetPasswordRequest) returns (ForgetPasswordResponse);
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
+}
+
+message SendOTPRequest {
+    string email = 1;
+    string phone = 2;
+}
+
+message SendOTPResponse {
+    string message = 1;
+}
+
+message VerifyOTPRequest {
+    string otp = 1;
+    string email = 2;
+    string phone = 3;
+}
+
+message VerifyOTPResponse {
+    string message = 1;
+    string token = 2;
+}
+
+message ForgetPasswordRequest {
+    string email = 1;
+    string phone = 2;
+    string password = 3;
+}
+
+message ForgetPasswordResponse {
+    string message = 1;
+}
+
+message ResetPasswordRequest {
+    string current_password = 1;
+    string new_password = 2;
+}
+
+message ResetPasswordResponse {
+    string message = 1;
 }
 
 message AdminRegisterResponse {

@@ -4,6 +4,7 @@ import { RequestWithMetadata } from "../middleware/setMetadata";
 import { StatusEnum } from "../../proto/issue/StatusEnum";
 import { ImpactEnum } from "../../proto/issue/ImpactEnum";
 import { UrgencyEnum } from "../../proto/issue/UrgencyEnum";
+import formatComments from "../../utils/formatComment";
 
 const createIssue = async (req: RequestWithMetadata, res: Response) => {
   try {
@@ -44,6 +45,9 @@ const getIssue = async (req: RequestWithMetadata, res: Response) => {
           .status(500)
           .json({ error: error.message || "Internal Server Error" });
       }
+
+      const fomatedComment = formatComments(response.comments);
+      response.comments = fomatedComment;
       res.status(200).json(response);
     });
   } catch (error: any) {
@@ -207,6 +211,18 @@ const resolveIssue = async (req: RequestWithMetadata, res: Response) => {
   }
 };
 
+const uploadFile = async (req: RequestWithMetadata, res: Response) => {
+  try {
+    const { issueId } = req.params;
+    // issueClient.UploadAttachment({});
+    res.status(200).json({
+      message: "File uploaded successfully",
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || "Internal Server Error" });
+  }
+};
+
 const issueViews = {
   resolveIssue,
   updateIssuePriorityImpact,
@@ -216,6 +232,7 @@ const issueViews = {
   listIssues,
   getAllIssues,
   assignIssue,
+  uploadFile,
 };
 
 export default issueViews;

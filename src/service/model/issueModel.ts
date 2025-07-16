@@ -47,11 +47,10 @@ const getIssue = async (issueId: number, role: string, userId: number) => {
     }
 
     const commentSql = mysql2.format(
-      "SELECT c.id, c.content, u.name as user_name, c.created_at FROM comment c INNER JOIN users u ON c.user_id = u.id WHERE c.issue_id = ?",
+      "SELECT c.id, c.content, u.name as userName, c.parent_id as parentId, c.created_at FROM comment c INNER JOIN users u ON c.user_id = u.id WHERE c.issue_id = ?",
       [issueId]
     );
     const [commentRows] = await pool.query<RowDataPacket[]>(commentSql);
-
     return {
       issue: rows[0] as Issue,
       comments: commentRows as Comment[],

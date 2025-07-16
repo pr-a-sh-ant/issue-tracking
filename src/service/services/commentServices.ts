@@ -10,13 +10,14 @@ const createComment = async (
   callback: sendUnaryData<CreateCommentResponse>
 ) => {
   try {
-    const { content, issueId } = call.request;
+    const { content, issueId, parentId } = call.request;
     // @ts-ignore
     const userId = call.user?.userId;
     const result = await commentModel.createComment(
       content,
       userId,
-      parseInt(issueId)
+      parseInt(issueId),
+      parentId ? parseInt(parentId) : null
     );
     callback(null, {
       message: result.message,

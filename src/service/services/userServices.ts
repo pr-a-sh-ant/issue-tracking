@@ -6,11 +6,21 @@ import { LoginResponse } from "../../proto/user/LoginResponse";
 import { RegisterRequest } from "../../proto/user/RegisterRequest";
 import { RegisterResponse } from "../../proto/user/RegisterResponse";
 import { AdminRegisterResponse } from "../../proto/user/AdminRegisterResponse";
+import { ForgetPasswordRequest } from "../../proto/user/ForgetPasswordRequest";
+import { ForgetPasswordResponse } from "../../proto/user/ForgetPasswordResponse";
+import { ResetPasswordRequest } from "../../proto/user/ResetPasswordRequest";
+import { ResetPasswordResponse } from "../../proto/user/ResetPasswordResponse";
+import { SendOTPRequest } from "src/proto/user/SendOTPRequest";
+import { SendOTPResponse } from "src/proto/user/SendOTPResponse";
+import { VerifyOTPRequest } from "src/proto/user/VerifyOTPRequest";
+import { VerifyOTPResponse } from "src/proto/user/VerifyOTPResponse";
 
 // Importing the helper functions and models
 import UserModel from "../model/userModel";
 import { generateToken } from "../../utils/token";
 import { setToken } from "../../redis/tokenCache";
+import sendOTPUtils from "../../utils/sendOTPUtils";
+import { validateOTPCache } from "../../redis/OTPCache";
 
 const LoginRequest = async (
   call: ServerUnaryCall<LoginRequest, LoginResponse>,
@@ -79,11 +89,100 @@ const AdminRegisterUser = async (
     });
   }
 };
+const forgetPassword = async (
+  call: ServerUnaryCall<ForgetPasswordRequest, ForgetPasswordResponse>,
+  callback: sendUnaryData<ForgetPasswordResponse>
+) => {
+  try {
+    const { password, email, phone } = call.request;
+    const result = await UserModel.forgetPassword(email, phone, password);
+    callback(null, { message: result.message || "Password reset successful" });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      details: error.message || "Internal server error",
+    });
+  }
+};
+
+const resetPassword = async (
+  call: ServerUnaryCall<ResetPasswordRequest, ResetPasswordResponse>,
+  callback: sendUnaryData<ResetPasswordResponse>
+) => {
+  try {
+    const { currentPassword, newPassword } = call.request;
+    //@ts-ignore
+    const userId = call.user?.userId;
+
+    const result = await UserModel.resetPassword(
+      userId,
+      currentPassword,
+      newPassword
+    );
+    callback(null, { message: result.message || "Password reset successful" });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      details: error.message || "Internal server error",
+    });
+  }
+};
+const sendOTP = async (
+  call: ServerUnaryCall<SendOTPRequest, SendOTPResponse>,
+  callback: sendUnaryData<SendOTPResponse>
+) => {
+  try {
+    const { email, phone } = call.request;
+    console.log("sendOTP called with:", { email, phone });
+    //verify the email or phone number
+    const result = await UserModel.verifyUser(email, phone);
+
+    // implement the logic inside sendOTPUtils
+    sendOTPUtils(email, parseInt(phone));
+
+    callback(null, {
+      message: `OTP sent to ${email || phone}`,
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      details: error.message || "Internal server error",
+    });
+  }
+};
+
+const verifyOTP = async (
+  call: ServerUnaryCall<VerifyOTPRequest, VerifyOTPResponse>,
+  callback: sendUnaryData<VerifyOTPResponse>
+) => {
+  try {
+    const { otp, email, phone } = call.request;
+    const response = await validateOTPCache(email !== "" ? email : phone);
+    if (response !== parseInt(otp)) {
+      callback({
+        code: status.INVALID_ARGUMENT,
+        details: "Invalid OTP",
+      });
+    }
+    callback(null, {
+      message: "OTP verified successfully",
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      details: error.message || "Internal server error",
+    });
+  }
+};
 
 const userHandler = {
-  LoginUser: LoginRequest,
-  RegisterUser: RegisterUser,
-  CreateAdminUser: AdminRegisterUser,
+  LoginRequest,
+  RegisterUser,
+  AdminRegisterUser,
+  forgetPassword,
+  resetPassword,
+  sendOTP,
+  verifyOTP,
 };
 
 export default userHandler;
