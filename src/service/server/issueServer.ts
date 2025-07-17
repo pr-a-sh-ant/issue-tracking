@@ -60,7 +60,8 @@ const logDef = loadPackageDefinition(
 
 const issueServer = new Server();
 
-const handler: IssueServiceHandlers = {
+// Issue Handlers
+const IssueHandler: IssueServiceHandlers = {
   CreateIssue: withAuth(issueHandler.createIssue),
   GetIssue: withAuth(issueHandler.getIssue),
   AssignIssue: withAuth(
@@ -83,17 +84,19 @@ const handler: IssueServiceHandlers = {
   UploadAttachment: withAuth(issueHandler.uploadAttachment),
 };
 
+// Comment Handlers
 const commentHandlerService: CommentServiceHandlers = {
   CreateComment: withAuth(commentHandler.createComment),
 };
 
+// Log Handlers
 const logHandler: AuditLogServiceHandlers = {
   GetLogEvents: withAuth(
     withRoleAuth(["superadmin"], auditlogHandler.getLogEvents)
   ),
 };
 
-issueServer.addService(issueDef.issue.IssueService.service, handler);
+issueServer.addService(issueDef.issue.IssueService.service, IssueHandler);
 issueServer.addService(
   commentDef.comment.CommentService.service,
   commentHandlerService

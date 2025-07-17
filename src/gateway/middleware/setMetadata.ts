@@ -11,7 +11,6 @@ const setMetadata = (
   next: NextFunction
 ) => {
   try {
-    console.log("Setting metadata for request");
     const metadata = new Metadata();
     metadata.add("authorization", req.headers.authorization || "");
     req.metadata = metadata;
