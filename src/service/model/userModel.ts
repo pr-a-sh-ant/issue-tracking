@@ -3,6 +3,7 @@ import { RowDataPacket, OkPacketParams } from "mysql2";
 import bcrypt from "bcrypt";
 import { RegisterRequest } from "../../proto/user/RegisterRequest";
 import mysql2 from "mysql2/promise";
+import { userInfo } from "os";
 
 export interface User {
   id: number;
@@ -92,16 +93,12 @@ const verifyUser = async (email: string | null, phone: string | null) => {
   }
 };
 
-const forgetPassword = async (
-  password: string,
-  email: string,
-  phone: string
-) => {
+const forgetPassword = async (userInfo: string, password: string) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const [result] = await pool.query<RowDataPacket[]>(
       "UPDATE users SET password = ? WHERE email = ? OR phone = ?",
-      [hashedPassword, email, phone]
+      [hashedPassword, userInfo, userInfo]
     );
     const affectedRows = (result as OkPacketParams).affectedRows;
     if (affectedRows === 0) {

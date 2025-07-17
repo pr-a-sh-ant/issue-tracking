@@ -20,7 +20,13 @@ import UserModel from "../model/userModel";
 import { generateToken } from "../../utils/token";
 import { setToken } from "../../redis/tokenCache";
 import sendOTPUtils from "../../utils/sendOTPUtils";
-import { validateOTPCache } from "../../redis/OTPCache";
+import { validateOTPCache, removeOTP } from "../../redis/OTPCache";
+import crypto from "crypto";
+import { storeResetToken, verifyResetToken } from "../../redis/tokenCache";
+
+function generateResetToken(): string {
+  return crypto.randomBytes(32).toString("hex");
+}
 
 const LoginRequest = async (
   call: ServerUnaryCall<LoginRequest, LoginResponse>,
@@ -29,7 +35,7 @@ const LoginRequest = async (
   try {
     const { email, password, phone } = call.request;
     const data = await UserModel.LoginUser({ email, password, phone });
-    const token = generateToken(data.id, data.role, 3600);
+    const token = generateToken({ userId: data.id, role: data.role }, 3600);
     await setToken(token, data.id.toString(), 3600);
     callback(null, {
       message: "Login successful",
@@ -52,7 +58,7 @@ const RegisterUser = async (
   try {
     const userDetail = call.request;
     const data = await UserModel.RegisterUser(userDetail);
-    const token = generateToken(data.insertId, "user", 3600);
+    const token = generateToken({ userId: data.insertId, role: "user" }, 3600);
     await setToken(token, data.insertId.toString(), 3600);
     callback(null, {
       message: "Registration successful",
@@ -94,8 +100,9 @@ const forgetPassword = async (
   callback: sendUnaryData<ForgetPasswordResponse>
 ) => {
   try {
-    const { password, email, phone } = call.request;
-    const result = await UserModel.forgetPassword(email, phone, password);
+    const { password, token } = call.request;
+    const userInfo = await verifyResetToken(token);
+    const result = await UserModel.forgetPassword(userInfo, password);
     callback(null, { message: result.message || "Password reset successful" });
   } catch (error: any) {
     callback({
@@ -133,7 +140,6 @@ const sendOTP = async (
 ) => {
   try {
     const { email, phone } = call.request;
-    console.log("sendOTP called with:", { email, phone });
     //verify the email or phone number
     const result = await UserModel.verifyUser(email, phone);
 
@@ -157,15 +163,21 @@ const verifyOTP = async (
 ) => {
   try {
     const { otp, email, phone } = call.request;
-    const response = await validateOTPCache(email !== "" ? email : phone);
+    const userDetail = email !== "" ? email : phone.toString();
+    const response = await validateOTPCache(userDetail);
+    const token = generateResetToken();
+    storeResetToken(token, userDetail);
     if (response !== parseInt(otp)) {
       callback({
         code: status.INVALID_ARGUMENT,
         details: "Invalid OTP",
       });
     }
+    removeOTP(email !== "" ? email : phone);
+
     callback(null, {
       message: "OTP verified successfully",
+      token: token,
     });
   } catch (error: any) {
     callback({

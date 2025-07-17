@@ -11,6 +11,7 @@ const config = {
     port: Number(process.env.DB_PORT) || 3306,
   },
   jwtSecret: process.env.JWT_SECRET,
+  resetPasswordJwtToken: process.env.RESET_PASSWORD_JWT_TOKEN,
   redisPassword: process.env.REDIS_PASSWORD,
 };
 

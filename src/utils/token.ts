@@ -2,14 +2,12 @@ import config from "../config/config";
 import jwt from "jsonwebtoken";
 
 export const generateToken = (
-  userId: number,
-  role: string,
+  detail: { userId: number; role: string } | { userInfo: string },
   expiration: number
 ): string => {
-  const payload = { userId, role };
   const secretKey = config.jwtSecret;
 
-  return jwt.sign(payload, secretKey, {
+  return jwt.sign(detail, secretKey, {
     expiresIn: expiration,
   });
 };

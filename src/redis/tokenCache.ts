@@ -21,3 +21,22 @@ export async function validateTokenCache(
   const userId = await redisClient.get(key);
   return userId.toString() ?? null;
 }
+
+export async function storeResetToken(
+  token: string,
+  userId: string
+): Promise<void> {
+  const key = `reset:${token}`;
+  const ttlSeconds = 15 * 60; // 15 minutes
+
+  await redisClient.set(key, userId, { EX: ttlSeconds });
+}
+
+export async function verifyResetToken(token: string): Promise<string | null> {
+  const key = `reset:${token}`;
+  const userInfo = await redisClient.get(key);
+  if (!userInfo) {
+    throw new Error("Invalid or expired reset token");
+  }
+  return userInfo.toString();
+}

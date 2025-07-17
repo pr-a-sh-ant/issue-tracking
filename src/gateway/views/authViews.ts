@@ -2,6 +2,7 @@ import { userClient } from "../client";
 import { Request, response, Response } from "express";
 import { Metadata } from "@grpc/grpc-js";
 import { RequestWithMetadata } from "../middleware/setMetadata";
+import { verifyToken } from "../../utils/token";
 
 const login = async (req: Request, res: Response) => {
   try {
@@ -115,6 +116,7 @@ const verifyOTP = async (req: Request, res: Response) => {
         }
         res.status(200).json({
           message: response.message,
+          token: response.token,
         });
       }
     );
@@ -125,8 +127,9 @@ const verifyOTP = async (req: Request, res: Response) => {
 
 const forgetPassword = async (req: Request, res: Response) => {
   try {
-    const { email, phone, password } = req.body;
-    userClient.ForgetPassword({ email, phone, password }, (error, response) => {
+    const { token } = req.params;
+    const { password } = req.body;
+    userClient.ForgetPassword({ token, password }, (error, response) => {
       if (error) {
         return res.status(500).json({ error: error.details });
       }

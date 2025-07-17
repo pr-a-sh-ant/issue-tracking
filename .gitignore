@@ -8,3 +8,5 @@
 
 src/proto/**/*.ts
 src/proto/**/
+
+uploads
