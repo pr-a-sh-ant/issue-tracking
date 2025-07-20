@@ -99,6 +99,7 @@ const IssueHandler: IssueServiceHandlers = {
     withRoleAuth(["admin", "superadmin"], issueHandler.resolveIssue)
   ),
   UploadAttachment: withAuth(issueHandler.uploadAttachment),
+  DashboardIssues: withAuth(issueHandler.dashboardIssues),
 };
 
 // Comment Handlers

@@ -17,6 +17,8 @@ import { ResolveIssueRequest } from "src/proto/issue/ResolveIssueRequest";
 import { ResolveIssueResponse } from "src/proto/issue/ResolveIssueResponse";
 import { UploadAttachmentRequest } from "src/proto/issue/UploadAttachmentRequest";
 import { UploadAttachmentResponse } from "src/proto/issue/UploadAttachmentResponse";
+import { DashboardIssuesRequest } from "src/proto/issue/DashboardIssuesRequest";
+import { DashboardIssuesResponse } from "src/proto/issue/DashboardIssuesResponse";
 
 // Creating helper function and model
 import issueModel from "../model/issueModel";
@@ -290,6 +292,31 @@ const resolveIssue = async (
   }
 };
 
+const dashboardIssues = async (
+  call: ServerUnaryCall<DashboardIssuesRequest, DashboardIssuesResponse>,
+  callback: sendUnaryData<DashboardIssuesResponse>
+) => {
+  try {
+    // @ts-ignore
+    const user = call.user;
+    const result = await issueModel.dashboardIssues(user);
+    callback(null, {
+      message: "Dashboard issues retrieved successfully",
+      ackIssues: result.ackIssues.toString(),
+      closedIssues: result.closedIssues.toString(),
+      newIssues: result.newIssues.toString(),
+      list: result.list,
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      message:
+        error.message ||
+        "Internal server error while fetching dashboard issues",
+    });
+  }
+};
+
 const uploadAttachment = async (
   call: ServerUnaryCall<UploadAttachmentRequest, UpdateIssueDetailsResponse>,
   callback: sendUnaryData<UploadAttachmentResponse>
@@ -315,6 +342,7 @@ const issueHandler = {
   listIssuesByUser,
   updateIssueDetails,
   uploadAttachment,
+  dashboardIssues,
 };
 
 export default issueHandler;

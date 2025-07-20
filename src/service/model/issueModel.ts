@@ -9,6 +9,17 @@ interface CreateIssueRequestwithUserId extends CreateIssueRequest {
   created_at: Date;
   updated_at: Date;
 }
+interface DashboardIssuesResponse {
+  newIssues: number;
+  ackIssues: number;
+  closedIssues: number;
+  list?: string[];
+}
+
+interface User {
+  userId: number;
+  role: string;
+}
 
 const createIssue = async (
   issue: CreateIssueRequestwithUserId
@@ -192,6 +203,59 @@ const resolveIssue = async (
   }
 };
 
+const dashboardIssues = async (user: User) => {
+  try {
+    if (user.role === "user") {
+      const sql = mysql2.format(
+        `SELECT 
+          COUNT(CASE WHEN status = 'NEW' THEN 1 END) as newIssues,
+          COUNT(CASE WHEN status = 'ACK' THEN 1 END) as ackIssues,
+          COUNT(CASE WHEN (status = 'CLOSED' OR status = 'RESOLVED') THEN 1 END) as closedIssues
+         FROM issues WHERE created_by = ?`,
+        [user.userId]
+      );
+      const [rows] = await pool.query<RowDataPacket[]>(sql);
+      const createdAtSql = mysql2.format(
+        "SELECT created_at FROM issues WHERE created_by = ?",
+        [user.userId]
+      );
+      const [createdAtRows] = await pool.query<RowDataPacket[]>(createdAtSql);
+
+      return {
+        newIssues: rows[0].newIssues,
+        ackIssues: rows[0].ackIssues,
+        closedIssues: rows[0].closedIssues,
+        list: createdAtRows.map((row) =>
+          new Date(row.created_at).toISOString()
+        ),
+      } as DashboardIssuesResponse;
+    } else if (user.role === "admin") {
+      const sql = mysql2.format(
+        `SELECT 
+          (SELECT COUNT(*) FROM issues WHERE status = 'NEW') as newIssues,
+          COUNT(CASE WHEN admin_id = ? AND (status = 'ACK') THEN 1 END) as ackIssues,
+          COUNT(CASE WHEN admin_id = ? AND (status = 'CLOSED' OR status = 'RESOLVED') THEN 1 END) as closedIssues
+         FROM issues`,
+        [user.userId, user.userId]
+      );
+      const [rows] = await pool.query<RowDataPacket[]>(sql);
+      return rows[0] as DashboardIssuesResponse;
+    } else if (user.role === "superadmin") {
+      const sql = mysql2.format(
+        `SELECT 
+          (SELECT COUNT(*) FROM issues WHERE status = 'NEW') as newIssues,
+          (SELECT COUNT(*) FROM issues WHERE status = 'ACK') as ackIssues,
+          (SELECT COUNT(*) FROM issues WHERE status = 'CLOSED' OR status = 'RESOLVED') as closedIssues
+         FROM issues`
+      );
+      const [rows] = await pool.query<RowDataPacket[]>(sql);
+      return rows[0] as DashboardIssuesResponse;
+    }
+  } catch (error: any) {
+    throw new Error(`Error fetching dashboard data: ${error.message}`);
+  }
+};
+
 const issueModel = {
   resolveIssue,
   updateIssuePriorityImpact,
@@ -201,6 +265,7 @@ const issueModel = {
   assignIssue,
   listIssuesByUser,
   listAllIssues,
+  dashboardIssues,
 };
 
 export default issueModel;

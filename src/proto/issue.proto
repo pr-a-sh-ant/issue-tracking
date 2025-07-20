@@ -20,9 +20,10 @@ message DashboardIssuesRequest {
 
 message DashboardIssuesResponse {
     string message = 1;
-    int newIssues = 2;
-    int ackIssues = 3;
-    int closedIssues = 4; // issues that are resolved and closed
+    string newIssues = 2;
+    string ackIssues = 3;
+    string closedIssues = 4; // issues that are resolved and closed
+    repeated string list = 5; // List of dates when issues were created
 }
 
 message UploadAttachmentRequest {

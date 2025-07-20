@@ -19,6 +19,7 @@ issueRouter.patch(
   "/update-issue-priority-impact/:issueId",
   issueViews.updateIssuePriorityImpact
 );
+issueRouter.get("/dashboard-issues", issueViews.dashboardIssues);
 issueRouter.post("/resolve-issue/:issueId", issueViews.resolveIssue);
 
 issueRouter.post(

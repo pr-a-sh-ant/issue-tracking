@@ -5,6 +5,7 @@ import { StatusEnum } from "../../proto/issue/StatusEnum";
 import { ImpactEnum } from "../../proto/issue/ImpactEnum";
 import { UrgencyEnum } from "../../proto/issue/UrgencyEnum";
 import formatComments from "../../utils/formatComment";
+import formatListDate from "../../utils/formatDate";
 
 const createIssue = async (req: RequestWithMetadata, res: Response) => {
   try {
@@ -223,6 +224,24 @@ const uploadFile = async (req: RequestWithMetadata, res: Response) => {
   }
 };
 
+const dashboardIssues = async (req: RequestWithMetadata, res: Response) => {
+  try {
+    // @ts-ignore
+    const user = req.user;
+    issueClient.DashboardIssues({}, req.metadata, (error, response) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: error.message || "Internal Server Error" });
+      }
+      const formatedList = formatListDate(response.list);
+      res.status(200).json({ ...response, list: formatedList });
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || "Internal Server Error" });
+  }
+};
+
 const issueViews = {
   resolveIssue,
   updateIssuePriorityImpact,
@@ -233,6 +252,7 @@ const issueViews = {
   getAllIssues,
   assignIssue,
   uploadFile,
+  dashboardIssues,
 };
 
 export default issueViews;
