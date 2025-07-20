@@ -12,6 +12,17 @@ service IssueService {
     rpc UpdateIssuePriorityImpact (UpdateIssuePriorityImpactRequest) returns (UpdateIssuePriorityImpactResponse);
     rpc ResolveIssue (ResolveIssueRequest) returns (ResolveIssueResponse);
     rpc UploadAttachment(UploadAttachmentRequest) returns (UploadAttachmentResponse);
+    rpc DashboardIssues (DashboardIssuesRequest) returns (DashboardIssuesResponse);
+}
+
+message DashboardIssuesRequest {
+}
+
+message DashboardIssuesResponse {
+    string message = 1;
+    int newIssues = 2;
+    int ackIssues = 3;
+    int closedIssues = 4; // issues that are resolved and closed
 }
 
 message UploadAttachmentRequest {
@@ -82,7 +93,18 @@ message GetIssueResponse {
     Issue Issue = 1;
     repeated Comment comments = 2;
     repeated Attachment attachments = 3;
-    string message = 4;
+    repeated SubTask subTasks = 4;
+    string message = 5;
+}
+
+message SubTask {
+    string subTaskId = 1;
+    string task = 2;
+    string status = 3;
+    string issueId = 4;
+    string createdBy = 5;
+    string createdAt = 6;
+    string updatedAt = 7;
 }
 
 message Comment {

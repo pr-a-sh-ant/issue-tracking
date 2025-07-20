@@ -96,7 +96,6 @@ const createAdmin = async (req: Request, res: Response) => {
       }
     );
   } catch (error: any) {
-    console.error("Admin creation failed:", error);
     res.status(500).json({ error: error.message || "Admin creation failed" });
   }
 };

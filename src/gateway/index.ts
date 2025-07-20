@@ -5,6 +5,7 @@ import authRouter from "./routes/authRoutes";
 import issueRouter from "./routes/issueRoutes";
 import commentRouter from "./routes/commentRouter";
 import auditLogRouter from "./routes/auditLogRoutes";
+import subTaskRouter from "./routes/subTaskRoutes";
 
 const userApp = express();
 const issueApp = express();
@@ -19,6 +20,7 @@ userApp.use("/api/v1/auth", authRouter);
 issueApp.use("/api/v1/issue", issueRouter);
 issueApp.use("/api/v1/comment", commentRouter);
 issueApp.use("/api/v1/logs", auditLogRouter);
+issueApp.use("/api/v1/subtask", subTaskRouter);
 
 userApp.listen(3000, () => {
   console.log("User Client is running on http://localhost:3000");

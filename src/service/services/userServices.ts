@@ -163,7 +163,6 @@ const verifyOTP = async (
   try {
     const { otp, email, phone } = call.request;
     const userDetail = email !== "" ? email : phone;
-    console.log("User detail for OTP verification:", userDetail);
     const response = await validateOTPCache(userDetail);
     const token = generateResetToken();
     storeResetToken(token, userDetail);

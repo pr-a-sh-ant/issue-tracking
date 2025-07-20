@@ -20,7 +20,6 @@ export async function validateOTPCache(
   try {
     const key = `otp:${userDetail}`;
     const otp = await redisClient.get(key);
-    console.log("OTP from cache:", otp);
     const otpStr = typeof otp === "string" ? otp : otp?.toString();
     return otp ? parseInt(otpStr, 10) : null;
   } catch (error: any) {

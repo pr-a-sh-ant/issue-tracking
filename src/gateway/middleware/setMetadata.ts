@@ -16,7 +16,6 @@ const setMetadata = (
     req.metadata = metadata;
     next();
   } catch (error) {
-    console.error("Error setting metadata:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

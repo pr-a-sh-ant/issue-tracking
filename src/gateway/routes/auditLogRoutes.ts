@@ -28,7 +28,6 @@ auditLogRouter.get(
         }
       );
     } catch (error) {
-      console.error("Error retrieving audit logs:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   }

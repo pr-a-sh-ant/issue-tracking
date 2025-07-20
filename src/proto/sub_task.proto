@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package sub_task;
+
+service SubTaskService {
+  rpc CreateSubTask (CreateSubTaskRequest) returns (CreateSubTaskResponse);
+  rpc CompleteSubTask (CompleteSubTaskRequest) returns (CompleteSubTaskResponse);
+}
+
+message CreateSubTaskRequest{
+    string issueId = 1;
+    string task = 2;
+}
+
+message CreateSubTaskResponse{
+    string message = 1;
+}
+
+message CompleteSubTaskRequest{
+    string issueId = 1;
+    string taskId = 2;
+}
+
+message CompleteSubTaskResponse{
+    string message = 1;
+}

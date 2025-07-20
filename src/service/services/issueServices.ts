@@ -21,6 +21,7 @@ import { UploadAttachmentResponse } from "src/proto/issue/UploadAttachmentRespon
 // Creating helper function and model
 import issueModel from "../model/issueModel";
 import auditlogModel from "../model/auditlogModel";
+import subTaskModel from "../model/subTaskModel";
 
 // importing types
 import { LogEventTable } from "../model/auditlogModel";
@@ -88,7 +89,7 @@ const getIssue = async (
       user?.role,
       user?.userId
     );
-
+    const getSubTasks = await subTaskModel.getSubTasks(parseInt(issueId));
     if (!issueResult) {
       return callback({
         code: status.NOT_FOUND,
@@ -99,6 +100,7 @@ const getIssue = async (
       message: "Issue retrieved successfully",
       Issue: issueResult.issue,
       comments: issueResult.comments,
+      subTasks: getSubTasks,
     });
   } catch (error: any) {
     callback({

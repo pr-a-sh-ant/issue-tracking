@@ -8,7 +8,6 @@ const createComment = async (
   parentId: number | null = null
 ) => {
   try {
-    console.log(parentId);
     //check if the issue exists and it is created by the user or either the user is an admin
     const checkIssueSql = mysql2.format(
       "SELECT issues.issue_id FROM issues WHERE issue_id = ? AND (created_by = ? OR EXISTS (SELECT 1 FROM users WHERE id = ? AND role IN ('admin', 'superadmin')))",
@@ -27,7 +26,6 @@ const createComment = async (
     const [result] = await pool.query<RowDataPacket[]>(sql);
     const response = result as OkPacketParams;
     if (response.affectedRows === 0) {
-      console.log("Failed to create comment");
       throw new Error("Failed to create comment");
     }
     return { message: "Comment created successfully" };
