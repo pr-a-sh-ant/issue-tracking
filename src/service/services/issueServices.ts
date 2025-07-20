@@ -33,6 +33,15 @@ const createIssue = async (
     const issue = call.request;
     // @ts-ignore
     const created_by = call.user?.userId;
+    // @ts-ignore
+    const role = call.user?.role;
+    if (role === "admin" || role === "superadmin") {
+      callback({
+        code: status.PERMISSION_DENIED,
+        message: "Admins cannot create issues directly",
+      });
+    }
+
     const result = await issueModel.createIssue({
       ...issue,
       created_by,

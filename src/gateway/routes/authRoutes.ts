@@ -8,7 +8,7 @@ authRouter.post("/login", authViews.login);
 authRouter.post("/register", authViews.register);
 authRouter.post("/send-otp", authViews.sendOtp);
 authRouter.post("/verify-otp", authViews.verifyOTP);
-authRouter.post("/forgot-password", authViews.forgetPassword);
+authRouter.post("/forgot-password/:token", authViews.forgetPassword);
 
 authRouter.use(setMetadata);
 

@@ -1,12 +1,25 @@
 import { userClient } from "../client";
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
+import { isEmail, isMobilePhone } from "validator";
 import { Metadata } from "@grpc/grpc-js";
 import { RequestWithMetadata } from "../middleware/setMetadata";
-import { verifyToken } from "../../utils/token";
+
+const validateEmailOrPhone = (email: string, phone: string) => {
+  if (!email && !phone) {
+    throw new Error("Either email or phone must be provided");
+  }
+  if (email && !isEmail(email)) {
+    throw new Error("Invalid email format");
+  }
+  if (phone && !isMobilePhone(phone, "ne-NP")) {
+    throw new Error("Invalid phone format");
+  }
+};
 
 const login = async (req: Request, res: Response) => {
   try {
     const { email, phone, password } = req.body;
+    validateEmailOrPhone(email, phone);
     userClient.LoginUser(
       {
         email,
@@ -24,15 +37,15 @@ const login = async (req: Request, res: Response) => {
         });
       }
     );
-  } catch (error) {
-    console.error("Login failed:", error);
-    throw error;
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || "Login failed" });
   }
 };
 
 const register = async (req: Request, res: Response) => {
   try {
     const { email, name, phone, password } = req.body;
+    validateEmailOrPhone(email, phone);
 
     userClient.RegisterUser(
       {
@@ -52,9 +65,8 @@ const register = async (req: Request, res: Response) => {
         });
       }
     );
-  } catch (error) {
-    console.error("Registration failed:", error);
-    res.status(500).json({ error: "Registration failed" });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || "Registration failed" });
   }
 };
 
@@ -109,7 +121,7 @@ const verifyOTP = async (req: Request, res: Response) => {
   try {
     const { email, otp, phone } = req.body;
     userClient.verifyOTP(
-      { email, otp: otp.toString(), phone: phone.toString() },
+      { email, otp: otp.toString(), phone: phone },
       (error, response) => {
         if (error) {
           return res.status(500).json({ error: error.details });

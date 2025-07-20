@@ -43,7 +43,6 @@ const LoginRequest = async (
       role: data.role,
     });
   } catch (error: any) {
-    console.error("Error in LoginRequest:", error);
     callback({
       code: status.INTERNAL,
       details: error.message || "Internal server error",
@@ -163,7 +162,8 @@ const verifyOTP = async (
 ) => {
   try {
     const { otp, email, phone } = call.request;
-    const userDetail = email !== "" ? email : phone.toString();
+    const userDetail = email !== "" ? email : phone;
+    console.log("User detail for OTP verification:", userDetail);
     const response = await validateOTPCache(userDetail);
     const token = generateResetToken();
     storeResetToken(token, userDetail);

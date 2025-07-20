@@ -3,7 +3,6 @@ import { RowDataPacket, OkPacketParams } from "mysql2";
 import bcrypt from "bcrypt";
 import { RegisterRequest } from "../../proto/user/RegisterRequest";
 import mysql2 from "mysql2/promise";
-import { userInfo } from "os";
 
 export interface User {
   id: number;
