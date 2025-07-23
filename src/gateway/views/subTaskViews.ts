@@ -1,59 +1,60 @@
 import { RequestWithMetadata } from "../middleware/setMetadata";
-import { Response } from "express";
+import { Response, NextFunction } from "express";
 import { subTaskClient } from "../client";
+import AppError from "../../utils/appError";
 
-const createSubTask = async (req: RequestWithMetadata, res: Response) => {
-  try {
-    const { issueId } = req.params;
-    const { task } = req.body;
-    if (!issueId || !task) {
-      return res.status(400).json({ error: "Issue ID and task are required" });
-    }
-    subTaskClient.CreateSubTask(
-      { issueId, task },
-      req.metadata,
-      (error, response) => {
-        if (error) {
-          return res
-            .status(500)
-            .json({ error: error.message || "Internal Server Error" });
-        }
-
-        return res.status(201).json({ message: response.message });
-      }
-    );
-  } catch (error: any) {
-    return res
-      .status(500)
-      .json({ error: error.message || "Internal Server Error" });
+const createSubTask = async (
+  req: RequestWithMetadata,
+  res: Response,
+  next: NextFunction
+) => {
+  const { issueId } = req.params;
+  const { task } = req.body;
+  if (!issueId || !task) {
+    return next(new AppError("Issue ID and task are required", 400));
   }
+  subTaskClient.CreateSubTask(
+    { issueId, task },
+    req.metadata,
+    (error, response) => {
+      if (error) {
+        return next(
+          new AppError(
+            error.message || "Internal Server Error",
+            AppError.mapGRPCCodeToHTTP(error.code)
+          )
+        );
+      }
+
+      return res.status(201).json({ message: response.message });
+    }
+  );
 };
 
-const completeSubTask = async (req: RequestWithMetadata, res: Response) => {
-  try {
-    const { issueId, taskId } = req.params;
-    if (!taskId) {
-      return res
-        .status(400)
-        .json({ error: "Issue ID and task ID are required" });
-    }
-    subTaskClient.CompleteSubTask(
-      { taskId, issueId },
-      req.metadata,
-      (error, response) => {
-        if (error) {
-          return res
-            .status(500)
-            .json({ error: error.message || "Internal Server Error" });
-        }
-        return res.status(200).json({ message: response.message });
-      }
-    );
-  } catch (error: any) {
-    return res
-      .status(500)
-      .json({ error: error.message || "Internal Server Error" });
+const completeSubTask = async (
+  req: RequestWithMetadata,
+  res: Response,
+  next: NextFunction
+) => {
+  const { issueId, taskId } = req.params;
+  if (!taskId) {
+    return next(new AppError("Task ID is required", 400));
   }
+  subTaskClient.CompleteSubTask(
+    { taskId, issueId },
+    req.metadata,
+    (error, response) => {
+      if (error) {
+        return next(
+          new AppError(
+            error.message || "Internal Server Error",
+            AppError.mapGRPCCodeToHTTP(error.code)
+          )
+        );
+      }
+      return res.status(200).json({ message: response.message });
+    }
+  );
 };
 
 const subTaskViews = {

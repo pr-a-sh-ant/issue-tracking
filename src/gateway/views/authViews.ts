@@ -40,12 +40,12 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
         });
       }
     );
-  } catch (error: any) {
-    return next(new AppError(error.message || "Login failed", 500));
+  } catch (error: any | AppError) {
+    return next(new AppError(error.message || "Login failed", 400));
   }
 };
 
-const register = async (req: Request, res: Response) => {
+const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, name, phone, password } = req.body;
     validateEmailOrPhone(email, phone);
@@ -59,7 +59,9 @@ const register = async (req: Request, res: Response) => {
       },
       function (error, response) {
         if (error) {
-          return res.status(500).json({ error: error.details });
+          return next(
+            new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
+          );
         }
         res.status(200).json({
           message: response.message,
@@ -69,46 +71,49 @@ const register = async (req: Request, res: Response) => {
       }
     );
   } catch (error: any) {
-    res.status(500).json({ error: error.message || "Registration failed" });
+    return next(new AppError(error.message || "Registration Failed", 400));
   }
 };
 
-const createAdmin = async (req: Request, res: Response) => {
-  try {
-    const { email, name, phone, password } = req.body;
-    const metadata = new Metadata();
-    metadata.set("authorization", req.headers.authorization || "");
-    userClient.CreateAdminUser(
-      {
-        name,
-        email,
-        phone,
-        password,
-      },
-      metadata,
-      function (error, response) {
-        if (error) {
-          return res.status(500).json({ error: error.details });
-        }
-        res.status(200).json({
-          message: response.message,
-          adminId: response.adminId,
-          email: response.email,
-          password: response.password,
-        });
+const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.headers.authorization) {
+    return next(new AppError("Token Required", 401));
+  }
+  const { email, name, phone, password } = req.body;
+  const metadata = new Metadata();
+  metadata.set("authorization", req.headers.authorization || "");
+  userClient.CreateAdminUser(
+    {
+      name,
+      email,
+      phone,
+      password,
+    },
+    metadata,
+    function (error, response) {
+      if (error) {
+        return next(
+          new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
+        );
       }
-    );
-  } catch (error: any) {
-    res.status(500).json({ error: error.message || "Admin creation failed" });
-  }
+      res.status(200).json({
+        message: response.message,
+        adminId: response.adminId,
+        email: response.email,
+        password: response.password,
+      });
+    }
+  );
 };
 
-const sendOtp = async (req: Request, res: Response) => {
+const sendOtp = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, phone } = req.body;
     userClient.SendOTP({ email, phone }, (error, response) => {
       if (error) {
-        return res.status(500).json({ error: error.details });
+        return next(
+          new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
+        );
       }
       res.status(200).json({
         message: response.message,
@@ -119,14 +124,16 @@ const sendOtp = async (req: Request, res: Response) => {
   }
 };
 
-const verifyOTP = async (req: Request, res: Response) => {
+const verifyOTP = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, otp, phone } = req.body;
     userClient.verifyOTP(
       { email, otp: otp.toString(), phone: phone },
       (error, response) => {
         if (error) {
-          return res.status(500).json({ error: error.details });
+          return next(
+            new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
+          );
         }
         res.status(200).json({
           message: response.message,
@@ -139,13 +146,19 @@ const verifyOTP = async (req: Request, res: Response) => {
   }
 };
 
-const forgetPassword = async (req: Request, res: Response) => {
+const forgetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
     userClient.ForgetPassword({ token, password }, (error, response) => {
       if (error) {
-        return res.status(500).json({ error: error.details });
+        return next(
+          new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
+        );
       }
       res.status(200).json({
         message: response.message,
@@ -158,7 +171,11 @@ const forgetPassword = async (req: Request, res: Response) => {
   }
 };
 
-const resetPassword = async (req: RequestWithMetadata, res: Response) => {
+const resetPassword = async (
+  req: RequestWithMetadata,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { currentPassword, newPassword } = req.body;
     userClient.ResetPassword(
@@ -166,7 +183,9 @@ const resetPassword = async (req: RequestWithMetadata, res: Response) => {
       req.metadata,
       (error, response) => {
         if (error) {
-          return res.status(500).json({ error: error.details });
+          return next(
+            new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
+          );
         }
         res.status(200).json({
           message: response.message,
