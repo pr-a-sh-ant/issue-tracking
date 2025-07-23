@@ -132,7 +132,7 @@ const resetPassword = async (
     callback(null, { message: result.message || "Password reset successful" });
   } catch (error: any) {
     callback({
-      code: status.FAILED_PRECONDITION,
+      code: status.INVALID_ARGUMENT,
       details: error.message || "Internal server error",
     });
   }
@@ -154,7 +154,7 @@ const sendOTP = async (
     });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: status.INVALID_ARGUMENT,
       details: error.message || "Internal server error",
     });
   }

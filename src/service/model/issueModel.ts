@@ -3,6 +3,8 @@ import mysql2, { RowDataPacket, OkPacketParams } from "mysql2/promise";
 import { CreateIssueRequest } from "../../proto/issue/CreateIssueRequest";
 import { Issue } from "../../proto/issue/Issue";
 import { Comment } from "../../proto/issue/Comment";
+import { status as grpcStatus } from "@grpc/grpc-js";
+import GrpcError from "../../utils/grpcError";
 
 interface CreateIssueRequestwithUserId extends CreateIssueRequest {
   created_by: number;
@@ -37,7 +39,10 @@ const createIssue = async (
     const [result] = await pool.query<RowDataPacket[]>(sql);
     return result as OkPacketParams;
   } catch (error: any) {
-    throw new Error(`Error creating issue: ${error.message}`);
+    throw new GrpcError(
+      `Error creating issue: ${error.message}`,
+      grpcStatus.INTERNAL
+    );
   }
 };
 
@@ -51,10 +56,13 @@ const getIssue = async (issueId: number, role: string, userId: number) => {
 
     const [rows] = await pool.query<RowDataPacket[]>(sql);
     if (rows.length === 0) {
-      throw new Error("Issue not found");
+      throw new GrpcError("Issue not found", grpcStatus.NOT_FOUND);
     }
     if (!isAdmin && rows[0].id !== userId) {
-      throw new Error("You do not have permission to view this issue");
+      throw new GrpcError(
+        "You do not have permission to view this issue",
+        grpcStatus.PERMISSION_DENIED
+      );
     }
 
     const commentSql = mysql2.format(
@@ -67,7 +75,7 @@ const getIssue = async (issueId: number, role: string, userId: number) => {
       comments: commentRows as Comment[],
     };
   } catch (error: any) {
-    throw new Error(`Error fetching issue: ${error.message}`);
+    throw error;
   }
 };
 
@@ -80,10 +88,13 @@ const assignIssue = async (issueId: number, adminId: number) => {
     );
     const [rows] = await pool.query<RowDataPacket[]>(checkSql);
     if (rows.length === 0) {
-      throw new Error("Issue not found");
+      throw new GrpcError("Issue not found", grpcStatus.NOT_FOUND);
     }
     if (rows[0].admin_id !== null) {
-      throw new Error("Issue is already assigned");
+      throw new GrpcError(
+        "Issue is already assigned",
+        grpcStatus.ALREADY_EXISTS
+      );
     }
 
     // Assign the issue
@@ -94,7 +105,7 @@ const assignIssue = async (issueId: number, adminId: number) => {
     const [result] = await pool.query<RowDataPacket[]>(sql);
     return { message: "Issue assigned successfully" };
   } catch (error: any) {
-    throw new Error(`Error assigning issue: ${error.message}`);
+    throw error;
   }
 };
 
@@ -133,7 +144,12 @@ const listIssuesByUser = async (
       baseSql += " WHERE " + whereClauses.join(" AND ");
     }
 
-    if (typeof limit === "number" && typeof page === "number") {
+    if (
+      typeof limit === "number" &&
+      typeof page === "number" &&
+      limit > 0 &&
+      page > 0
+    ) {
       baseSql += " LIMIT ? OFFSET ?";
       params.push(limit, (page - 1) * limit);
     }
@@ -141,11 +157,14 @@ const listIssuesByUser = async (
     const sql = mysql2.format(baseSql, params);
     const [rows] = await pool.query<RowDataPacket[]>(sql);
     if (rows.length === 0) {
-      throw new Error("No issues found for this user");
+      throw new GrpcError("No issues found", grpcStatus.NOT_FOUND);
     }
     return rows as Issue[];
   } catch (error: any) {
-    throw new Error(`Error listing issues: ${error.message}`);
+    throw new GrpcError(
+      `Error listing issues: ${error.message}`,
+      error.status || grpcStatus.INTERNAL
+    );
   }
 };
 
@@ -188,7 +207,10 @@ const listAllIssues = async (
     const [rows] = await pool.query<RowDataPacket[]>(sql);
     return rows as Issue[];
   } catch (error: any) {
-    throw new Error(`Error listing all issues: ${error.message}`);
+    throw new GrpcError(
+      `Error listing issues: ${error.message}`,
+      error.status || grpcStatus.INTERNAL
+    );
   }
 };
 
@@ -205,13 +227,14 @@ const updateIssueDetails = async (
     const [result] = await pool.query<RowDataPacket[]>(sql);
     const affectedRows = (result as OkPacketParams).affectedRows;
     if (affectedRows === 0) {
-      throw new Error(
-        "Issue not found or you do not have permission to update it"
+      throw new GrpcError(
+        "Issue not found or you do not have permission to update it",
+        grpcStatus.NOT_FOUND
       );
     }
     return { message: "Issue updated successfully" };
   } catch (error: any) {
-    throw new Error(`Error updating issue details: ${error.message}`);
+    throw error;
   }
 };
 
@@ -229,14 +252,16 @@ const updateIssuePriorityImpact = async (
     const [result] = await pool.query<RowDataPacket[]>(sql);
     const affectedRows = (result as OkPacketParams).affectedRows;
     if (affectedRows === 0) {
-      throw new Error(
-        "Issue not found or you do not have permission to update it"
+      throw new GrpcError(
+        "Issue not found or you do not have permission to update it",
+        grpcStatus.NOT_FOUND
       );
     }
     return { message: "Issue priority and impact updated successfully" };
   } catch (error: any) {
-    throw new Error(
-      `Error updating issue priority and impact: ${error.message}`
+    throw new GrpcError(
+      `Error updating issue priority and impact: ${error.message}`,
+      error.status || grpcStatus.INTERNAL
     );
   }
 };
@@ -254,13 +279,17 @@ const resolveIssue = async (
     const [result] = await pool.query<RowDataPacket[]>(sql);
     const affectedRows = (result as OkPacketParams).affectedRows;
     if (affectedRows === 0) {
-      throw new Error(
-        "Issue not found or you do not have permission to resolve it"
+      throw new GrpcError(
+        "Issue not found or you do not have permission to resolve it",
+        grpcStatus.NOT_FOUND
       );
     }
     return { message: "Issue resolved successfully" };
   } catch (error: any) {
-    throw new Error(`Error resolving issue: ${error.message}`);
+    throw new GrpcError(
+      `Error resolving issue: ${error.message}`,
+      error.status || grpcStatus.INTERNAL
+    );
   }
 };
 
@@ -313,7 +342,10 @@ const dashboardIssues = async (user: User) => {
       return rows[0] as DashboardIssuesResponse;
     }
   } catch (error: any) {
-    throw new Error(`Error fetching dashboard data: ${error.message}`);
+    throw new GrpcError(
+      `Error fetching dashboard issues: ${error.message}`,
+      grpcStatus.INTERNAL
+    );
   }
 };
 
@@ -326,11 +358,17 @@ const deleteIssue = async (issueId: number, userId: number) => {
     const [result] = await pool.query<RowDataPacket[]>(sql);
     const affectedRows = (result as OkPacketParams).affectedRows;
     if (affectedRows === 0) {
-      throw new Error("Issue not found or Issue already acknowledged");
+      throw new GrpcError(
+        "Issue not found or Issue already acknowledged",
+        grpcStatus.NOT_FOUND
+      );
     }
     return { message: "Issue deleted successfully" };
   } catch (error: any) {
-    throw new Error(`Error deleting issue: ${error.message}`);
+    throw new GrpcError(
+      `Error deleting issue: ${error.message}`,
+      error.status || grpcStatus.INTERNAL
+    );
   }
 };
 

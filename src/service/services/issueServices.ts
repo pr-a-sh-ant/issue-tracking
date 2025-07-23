@@ -29,6 +29,7 @@ import subTaskModel from "../model/subTaskModel";
 import { LogEventTable } from "../model/auditlogModel";
 import { DeleteIssueRequest } from "src/proto/issue/DeleteIssueRequest";
 import { DeleteIssueResponse } from "src/proto/issue/DeleteIssueResponse";
+import GrpcError from "../../utils/grpcError";
 
 const createIssue = async (
   call: ServerUnaryCall<CreateIssueRequest, CreateIssueResponse>,
@@ -67,7 +68,7 @@ const createIssue = async (
     });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: error.status || status.INTERNAL,
       message: error.message || "Internal server error",
     });
   }
@@ -94,8 +95,8 @@ const getIssue = async (
       user?.userId
     );
     const getSubTasks = await subTaskModel.getSubTasks(parseInt(issueId));
-    if (!issueResult) {
-      return callback({
+    if (issueResult) {
+      callback({
         code: status.NOT_FOUND,
         message: "Issue not found",
       });
@@ -106,9 +107,9 @@ const getIssue = async (
       comments: issueResult.comments,
       subTasks: getSubTasks,
     });
-  } catch (error: any) {
+  } catch (error: GrpcError | any) {
     callback({
-      code: status.INTERNAL,
+      code: error.status,
       message: error.message || "Internal server error",
     });
   }
@@ -144,7 +145,7 @@ const assignIssue = async (
     });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: error.status || status.INTERNAL,
       message: error.message || "Internal server error",
     });
   }
@@ -168,7 +169,7 @@ const listIssues = async (
     });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: error.status || status.INTERNAL,
       message: error.message || "Internal server error",
     });
   }
@@ -196,7 +197,7 @@ const listIssuesByUser = async (
     });
   } catch (error: any) {
     callback({
-      code: status.NOT_FOUND,
+      code: error.status || status.INTERNAL,
       message: error.message || "Internal server error while listing issues",
     });
   }
@@ -220,7 +221,7 @@ const updateIssueDetails = async (
     });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: error.status || status.INTERNAL,
       message:
         error.message || "Internal server error while updating issue details",
     });
@@ -258,7 +259,7 @@ const updateIssuePriorityImpact = async (
     });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: error.status || status.INTERNAL,
       message:
         error.message ||
         "Internal server error while updating issue priority and impact",
@@ -293,7 +294,7 @@ const resolveIssue = async (
     });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: error.status || status.INTERNAL,
       message: error.message || "Internal server error while resolving issue",
     });
   }
@@ -316,7 +317,7 @@ const dashboardIssues = async (
     });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: error.status || status.INTERNAL,
       message:
         error.message ||
         "Internal server error while fetching dashboard issues",
@@ -332,7 +333,7 @@ const uploadAttachment = async (
     const { fileName, filePath, issueId, createdBy } = call.request;
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: error.status || status.INTERNAL,
       message:
         error.message || "Internal server error while uploading attachment",
     });
@@ -353,7 +354,7 @@ const deleteIssue = async (
     });
   } catch (error: any) {
     callback({
-      code: status.FAILED_PRECONDITION,
+      code: error.status || status.INTERNAL,
       message: error.message || "Internal server error while deleting issue",
     });
   }

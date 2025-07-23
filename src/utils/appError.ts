@@ -25,6 +25,7 @@ class AppError extends Error {
       13: 500, // Internal
       14: 503, // Unavailable
       15: 401, // Unauthenticated
+      16: 401, // Unauthorized
     };
     return map[code] || 500;
   }

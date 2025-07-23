@@ -1,5 +1,7 @@
 import pool from "../../db/db";
 import mysql2, { RowDataPacket, OkPacketParams } from "mysql2/promise";
+import GrpcError from "../../utils/grpcError";
+import { status } from "@grpc/grpc-js";
 
 const createComment = async (
   content: string,
@@ -15,9 +17,7 @@ const createComment = async (
     );
     const [issueRows] = await pool.query<RowDataPacket[]>(checkIssueSql);
     if (issueRows.length === 0) {
-      throw new Error(
-        "Issue does not exist or you do not have permission to comment on it"
-      );
+      throw new GrpcError("Issue not found or access denied", status.NOT_FOUND);
     }
     const sql = mysql2.format(
       "INSERT INTO comment (content, user_id, issue_id,parent_id, created_at) VALUES (?, ?, ?,?, NOW())",
@@ -26,12 +26,13 @@ const createComment = async (
     const [result] = await pool.query<RowDataPacket[]>(sql);
     const response = result as OkPacketParams;
     if (response.affectedRows === 0) {
-      throw new Error("Failed to create comment");
+      throw new GrpcError("Failed to create comment", status.INTERNAL);
     }
     return { message: "Comment created successfully" };
   } catch (error: any) {
-    throw new Error(
-      error.message || "Internal server error while creating comment"
+    throw new GrpcError(
+      error.message || "Internal server error while creating comment",
+      error.status || status.INTERNAL
     );
   }
 };

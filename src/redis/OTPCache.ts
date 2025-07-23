@@ -34,7 +34,7 @@ export async function validateOTPCache(userDetail: string) {
       tries,
     };
   } catch (error: any) {
-    throw new AppError("Failed to validate OTP cache", 500, "CACHE_ERROR");
+    throw new AppError("Failed to validate OTP cache", 500);
   }
 }
 

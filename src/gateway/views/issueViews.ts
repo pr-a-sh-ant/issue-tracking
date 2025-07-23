@@ -48,6 +48,7 @@ const getIssue = async (
   }
   issueClient.GetIssue({ issueId }, req.metadata, (error, response) => {
     if (error) {
+      console.log(error.code);
       return next(
         new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
       );

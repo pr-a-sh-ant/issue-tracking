@@ -25,7 +25,7 @@ const createComment = async (
     });
   } catch (error: any) {
     callback({
-      code: status.UNAUTHENTICATED,
+      code: error.status || status.INTERNAL,
       message: error.message || "Internal server error",
     });
   }
