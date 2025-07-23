@@ -22,7 +22,7 @@ const getLogEvents = async (
   } catch (error: any) {
     callback(
       {
-        code: status.INTERNAL,
+        code: status.NOT_FOUND,
         message: error.message || "Internal server error",
       },
       null

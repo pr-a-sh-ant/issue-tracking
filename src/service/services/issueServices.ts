@@ -27,6 +27,8 @@ import subTaskModel from "../model/subTaskModel";
 
 // importing types
 import { LogEventTable } from "../model/auditlogModel";
+import { DeleteIssueRequest } from "src/proto/issue/DeleteIssueRequest";
+import { DeleteIssueResponse } from "src/proto/issue/DeleteIssueResponse";
 
 const createIssue = async (
   call: ServerUnaryCall<CreateIssueRequest, CreateIssueResponse>,
@@ -153,10 +155,12 @@ const listIssues = async (
   callback: sendUnaryData<ListIssuesResponse>
 ) => {
   try {
-    const { page, limit } = call.request;
+    const { page, limit, priority, status } = call.request;
     const result = await issueModel.listAllIssues(
       parseInt(page),
-      parseInt(limit)
+      parseInt(limit),
+      priority,
+      status
     );
     callback(null, {
       message: "All issues retrieved successfully",
@@ -176,12 +180,15 @@ const listIssuesByUser = async (
 ) => {
   try {
     //@ts-ignore
-    const userId = call.user?.userId;
-    const { page, limit } = call.request;
+    const user = call.user;
+    const { page, limit, priority, status } = call.request;
     const result = await issueModel.listIssuesByUser(
-      userId,
+      user.userId,
+      user.role,
       parseInt(page),
-      parseInt(limit)
+      parseInt(limit),
+      priority,
+      status
     );
     callback(null, {
       message: "Issues listed successfully",
@@ -332,11 +339,32 @@ const uploadAttachment = async (
   }
 };
 
+const deleteIssue = async (
+  call: ServerUnaryCall<DeleteIssueRequest, DeleteIssueResponse>,
+  callback: sendUnaryData<DeleteIssueResponse>
+) => {
+  try {
+    const { issueId } = call.request;
+    // @ts-ignore
+    const userId = call.user?.userId;
+    const result = await issueModel.deleteIssue(parseInt(issueId), userId);
+    callback(null, {
+      message: result.message || "Issue deleted successfully",
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      message: error.message || "Internal server error while deleting issue",
+    });
+  }
+};
+
 const issueHandler = {
   resolveIssue,
   assignIssue,
   updateIssuePriorityImpact,
   createIssue,
+  deleteIssue,
   getIssue,
   listIssues,
   listIssuesByUser,

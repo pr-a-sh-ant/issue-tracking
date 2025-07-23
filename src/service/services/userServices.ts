@@ -20,7 +20,11 @@ import UserModel from "../model/userModel";
 import { generateToken } from "../../utils/token";
 import { setToken } from "../../redis/tokenCache";
 import sendOTPUtils from "../../utils/sendOTPUtils";
-import { validateOTPCache, removeOTP } from "../../redis/OTPCache";
+import {
+  validateOTPCache,
+  removeOTP,
+  incrementTries,
+} from "../../redis/OTPCache";
 import crypto from "crypto";
 import { storeResetToken, verifyResetToken } from "../../redis/tokenCache";
 
@@ -67,7 +71,7 @@ const RegisterUser = async (
   } catch (error: any) {
     console.error("Error in RegisterUser:", error);
     callback({
-      code: status.INTERNAL,
+      code: status.ALREADY_EXISTS,
       details: error.message || "Internal server error",
     });
   }
@@ -128,7 +132,7 @@ const resetPassword = async (
     callback(null, { message: result.message || "Password reset successful" });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: status.FAILED_PRECONDITION,
       details: error.message || "Internal server error",
     });
   }
@@ -164,15 +168,22 @@ const verifyOTP = async (
     const { otp, email, phone } = call.request;
     const userDetail = email !== "" ? email : phone;
     const response = await validateOTPCache(userDetail);
-    const token = generateResetToken();
-    storeResetToken(token, userDetail);
-    if (response !== parseInt(otp)) {
-      callback({
-        code: status.INVALID_ARGUMENT,
+    if (Number(response.tries) > 3) {
+      return callback({
+        code: status.PERMISSION_DENIED,
+        details: "Too many attempts, please try again later",
+      });
+    }
+    if (Number(response.otp) !== Number(otp)) {
+      await incrementTries(userDetail);
+      return callback({
+        code: status.PERMISSION_DENIED,
         details: "Invalid OTP",
       });
     }
     removeOTP(email !== "" ? email : phone);
+    const token = generateResetToken();
+    storeResetToken(token, userDetail);
 
     callback(null, {
       message: "OTP verified successfully",
@@ -180,7 +191,7 @@ const verifyOTP = async (
     });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: status.UNAUTHENTICATED,
       details: error.message || "Internal server error",
     });
   }

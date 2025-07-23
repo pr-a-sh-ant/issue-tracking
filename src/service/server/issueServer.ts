@@ -100,6 +100,7 @@ const IssueHandler: IssueServiceHandlers = {
   ),
   UploadAttachment: withAuth(issueHandler.uploadAttachment),
   DashboardIssues: withAuth(issueHandler.dashboardIssues),
+  DeleteIssue: withAuth(withRoleAuth(["user"], issueHandler.deleteIssue)),
 };
 
 // Comment Handlers

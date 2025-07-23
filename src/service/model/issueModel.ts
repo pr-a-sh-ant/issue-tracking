@@ -100,14 +100,45 @@ const assignIssue = async (issueId: number, adminId: number) => {
 
 const listIssuesByUser = async (
   userId: number,
-  page: number,
-  limit: number
+  role: string,
+  page?: number,
+  limit?: number,
+  priority?: string,
+  status?: string
 ) => {
   try {
-    const sql = mysql2.format(
-      "SELECT i.issue_id, i.title, i.status,i.impact, u.name as created_by, i.admin_id, i.created_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id where i.created_by = ? LIMIT ? OFFSET ?",
-      [userId, limit, (page - 1) * limit]
-    );
+    let baseSql =
+      "SELECT i.issue_id, i.title, i.status, i.impact, u.name as created_by, i.admin_id, i.created_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id";
+    const whereClauses: string[] = [];
+    const params: any[] = [];
+
+    if (role === "admin" || role === "superadmin") {
+      whereClauses.push("i.admin_id = ?");
+      params.push(userId);
+    } else {
+      whereClauses.push("i.created_by = ?");
+      params.push(userId);
+    }
+
+    if (priority || priority !== "") {
+      whereClauses.push("i.priority = ?");
+      params.push(priority);
+    }
+    if (status || status !== "") {
+      whereClauses.push("i.status = ?");
+      params.push(status);
+    }
+
+    if (whereClauses.length > 0) {
+      baseSql += " WHERE " + whereClauses.join(" AND ");
+    }
+
+    if (typeof limit === "number" && typeof page === "number") {
+      baseSql += " LIMIT ? OFFSET ?";
+      params.push(limit, (page - 1) * limit);
+    }
+
+    const sql = mysql2.format(baseSql, params);
     const [rows] = await pool.query<RowDataPacket[]>(sql);
     if (rows.length === 0) {
       throw new Error("No issues found for this user");
@@ -118,12 +149,42 @@ const listIssuesByUser = async (
   }
 };
 
-const listAllIssues = async (page: number, limit: number) => {
+const listAllIssues = async (
+  page?: number,
+  limit?: number,
+  priority?: string,
+  status?: string
+) => {
   try {
-    const sql = mysql2.format(
-      "SELECT i.issue_id, i.title, i.status, i.impact, u.name as created_by, i.admin_id, i.created_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id LIMIT ? OFFSET ?",
-      [limit, (page - 1) * limit]
-    );
+    let baseSql =
+      "SELECT i.issue_id, i.title, i.status, i.impact, u.name as created_by, i.admin_id, i.created_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id";
+    const whereClauses: string[] = [];
+    const params: any[] = [];
+
+    if (priority || priority !== "") {
+      whereClauses.push("i.priority = ?");
+      params.push(priority);
+    }
+    if (status || status !== "") {
+      whereClauses.push("i.status = ?");
+      params.push(status);
+    }
+
+    if (whereClauses.length > 0) {
+      baseSql += " WHERE " + whereClauses.join(" AND ");
+    }
+
+    if (
+      typeof limit === "number" &&
+      typeof page === "number" &&
+      limit > 0 &&
+      page > 0
+    ) {
+      baseSql += " LIMIT ? OFFSET ?";
+      params.push(limit, (page - 1) * limit);
+    }
+
+    const sql = mysql2.format(baseSql, params);
     const [rows] = await pool.query<RowDataPacket[]>(sql);
     return rows as Issue[];
   } catch (error: any) {
@@ -256,6 +317,25 @@ const dashboardIssues = async (user: User) => {
   }
 };
 
+const deleteIssue = async (issueId: number, userId: number) => {
+  try {
+    const sql = mysql2.format(
+      "DELETE FROM issues WHERE issue_id = ? AND created_by = ?",
+      [issueId, userId]
+    );
+    const [result] = await pool.query<RowDataPacket[]>(sql);
+    const affectedRows = (result as OkPacketParams).affectedRows;
+    if (affectedRows === 0) {
+      throw new Error(
+        "Issue not found or you do not have permission to delete it"
+      );
+    }
+    return { message: "Issue deleted successfully" };
+  } catch (error: any) {
+    throw new Error(`Error deleting issue: ${error.message}`);
+  }
+};
+
 const issueModel = {
   resolveIssue,
   updateIssuePriorityImpact,
@@ -266,6 +346,7 @@ const issueModel = {
   listIssuesByUser,
   listAllIssues,
   dashboardIssues,
+  deleteIssue,
 };
 
 export default issueModel;

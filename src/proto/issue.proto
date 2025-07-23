@@ -13,6 +13,15 @@ service IssueService {
     rpc ResolveIssue (ResolveIssueRequest) returns (ResolveIssueResponse);
     rpc UploadAttachment(UploadAttachmentRequest) returns (UploadAttachmentResponse);
     rpc DashboardIssues (DashboardIssuesRequest) returns (DashboardIssuesResponse);
+    rpc DeleteIssue(DeleteIssueRequest) returns (DeleteIssueResponse);
+}
+
+message DeleteIssueRequest {
+    string issueId = 1;
+}
+
+message DeleteIssueResponse {
+    string message = 1;
 }
 
 message DashboardIssuesRequest {
@@ -133,6 +142,8 @@ message Issue {
 message ListIssuesRequest{
     string page = 1;
     string limit = 2;
+    string priority = 3; // Optional filter by priority
+    string status = 4; // Optional filter by status
 }
 
 message IssueShort {

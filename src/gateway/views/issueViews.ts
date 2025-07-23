@@ -58,7 +58,7 @@ const getIssue = async (req: RequestWithMetadata, res: Response) => {
 
 const listIssues = async (req: RequestWithMetadata, res: Response) => {
   try {
-    const { page, limit } = req.body || { page: 1, limit: 10 };
+    const { page, limit } = req.body;
     issueClient.ListIssuesByUser(
       {
         page,
@@ -81,10 +81,10 @@ const listIssues = async (req: RequestWithMetadata, res: Response) => {
 
 const getAllIssues = async (req: RequestWithMetadata, res: Response) => {
   try {
-    const { page, limit } = req.body || { page: 1, limit: 10 };
+    const { page = 0, limit = 0, priority = "", status = "" } = req.body;
 
     issueClient.ListIssues(
-      { page: page.toString(), limit: limit.toString() },
+      { page: page.toString(), limit: limit.toString(), priority, status },
       req.metadata,
       (error, response) => {
         if (error) {
