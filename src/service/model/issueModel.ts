@@ -320,15 +320,13 @@ const dashboardIssues = async (user: User) => {
 const deleteIssue = async (issueId: number, userId: number) => {
   try {
     const sql = mysql2.format(
-      "DELETE FROM issues WHERE issue_id = ? AND created_by = ?",
+      "DELETE FROM issues WHERE issue_id = ? AND status = 'NEW' AND created_by = ?",
       [issueId, userId]
     );
     const [result] = await pool.query<RowDataPacket[]>(sql);
     const affectedRows = (result as OkPacketParams).affectedRows;
     if (affectedRows === 0) {
-      throw new Error(
-        "Issue not found or you do not have permission to delete it"
-      );
+      throw new Error("Issue not found or Issue already acknowledged");
     }
     return { message: "Issue deleted successfully" };
   } catch (error: any) {

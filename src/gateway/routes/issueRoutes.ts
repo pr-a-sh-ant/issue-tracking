@@ -21,6 +21,7 @@ issueRouter.patch(
 );
 issueRouter.get("/dashboard-issues", issueViews.dashboardIssues);
 issueRouter.post("/resolve-issue/:issueId", issueViews.resolveIssue);
+issueRouter.delete("/delete-issue/:issueId", issueViews.deleteIssue);
 
 issueRouter.post(
   "/upload/:issueId",

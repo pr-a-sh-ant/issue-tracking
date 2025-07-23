@@ -196,7 +196,7 @@ const listIssuesByUser = async (
     });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: status.NOT_FOUND,
       message: error.message || "Internal server error while listing issues",
     });
   }
@@ -353,7 +353,7 @@ const deleteIssue = async (
     });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: status.FAILED_PRECONDITION,
       message: error.message || "Internal server error while deleting issue",
     });
   }

@@ -48,7 +48,7 @@ const LoginRequest = async (
     });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: status.INVALID_ARGUMENT,
       details: error.message || "Internal server error",
     });
   }
@@ -93,7 +93,7 @@ const AdminRegisterUser = async (
   } catch (error: any) {
     console.error("Error in RegisterUser:", error);
     callback({
-      code: status.INTERNAL,
+      code: status.ALREADY_EXISTS,
       details: error.message || "Internal server error",
     });
   }
@@ -109,7 +109,7 @@ const forgetPassword = async (
     callback(null, { message: result.message || "Password reset successful" });
   } catch (error: any) {
     callback({
-      code: status.INTERNAL,
+      code: status.INVALID_ARGUMENT,
       details: error.message || "Internal server error",
     });
   }

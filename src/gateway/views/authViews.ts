@@ -1,8 +1,9 @@
 import { userClient } from "../client";
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { isEmail, isMobilePhone } from "validator";
 import { Metadata } from "@grpc/grpc-js";
 import { RequestWithMetadata } from "../middleware/setMetadata";
+import AppError from "../../utils/appError";
 
 const validateEmailOrPhone = (email: string, phone: string) => {
   if (!email && !phone) {
@@ -16,7 +17,7 @@ const validateEmailOrPhone = (email: string, phone: string) => {
   }
 };
 
-const login = async (req: Request, res: Response) => {
+const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, phone, password } = req.body;
     validateEmailOrPhone(email, phone);
@@ -28,7 +29,9 @@ const login = async (req: Request, res: Response) => {
       },
       function (error, response) {
         if (error) {
-          return res.status(500).json({ error: error.details });
+          return next(
+            new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
+          );
         }
         res.status(200).json({
           message: response.message,
@@ -38,7 +41,7 @@ const login = async (req: Request, res: Response) => {
       }
     );
   } catch (error: any) {
-    res.status(500).json({ error: error.message || "Login failed" });
+    return next(new AppError(error.message || "Login failed", 500));
   }
 };
 
