@@ -95,7 +95,7 @@ const getIssue = async (
       user?.userId
     );
     const getSubTasks = await subTaskModel.getSubTasks(parseInt(issueId));
-    if (issueResult) {
+    if (!issueResult) {
       callback({
         code: status.NOT_FOUND,
         message: "Issue not found",
