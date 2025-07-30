@@ -11,6 +11,7 @@ authRouter.post("/verify-otp", authViews.verifyOTP);
 authRouter.post("/forgot-password/:token", authViews.forgetPassword);
 
 authRouter.use(setMetadata);
+authRouter.get("/get-me", authViews.getMe);
 
 authRouter.post("/reset-password", authViews.resetPassword);
 

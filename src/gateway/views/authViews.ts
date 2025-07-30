@@ -199,6 +199,31 @@ const resetPassword = async (
   }
 };
 
+const getMe = async (
+  req: RequestWithMetadata,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    userClient.GetMe({}, req.metadata, (error, response) => {
+      if (error) {
+        return next(
+          new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
+        );
+      }
+      res.status(200).json({
+        name: response.name,
+        email: response.email,
+        phone: response.phone,
+        role: response.role,
+        message: response.message,
+      });
+    });
+  } catch (error: any) {
+    return next(new AppError(error.message || "Failed to get user info", 500));
+  }
+};
+
 const authViews = {
   login,
   register,
@@ -207,6 +232,7 @@ const authViews = {
   verifyOTP,
   forgetPassword,
   resetPassword,
+  getMe,
 };
 
 export default authViews;

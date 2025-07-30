@@ -14,6 +14,8 @@ import { SendOTPRequest } from "src/proto/user/SendOTPRequest";
 import { SendOTPResponse } from "src/proto/user/SendOTPResponse";
 import { VerifyOTPRequest } from "src/proto/user/VerifyOTPRequest";
 import { VerifyOTPResponse } from "src/proto/user/VerifyOTPResponse";
+import { GetMeRequest } from "src/proto/user/GetMeRequest";
+import { GetMeResponse } from "src/proto/user/GetMeResponse";
 
 // Importing the helper functions and models
 import UserModel from "../model/userModel";
@@ -197,6 +199,29 @@ const verifyOTP = async (
   }
 };
 
+const getMe = async (
+  call: ServerUnaryCall<GetMeRequest, GetMeResponse>,
+  callback: sendUnaryData<GetMeResponse>
+) => {
+  try {
+    // @ts-ignore
+    const userRole = call.user?.userId;
+    const data = await UserModel.getMe(userRole);
+    callback(null, {
+      email: data.email,
+      name: data.name,
+      phone: data.phone,
+      role: data.role,
+      message: "User retrieved successfully",
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      details: error.message || "Internal server error",
+    });
+  }
+};
+
 const userHandler = {
   LoginRequest,
   RegisterUser,
@@ -205,6 +230,7 @@ const userHandler = {
   resetPassword,
   sendOTP,
   verifyOTP,
+  getMe,
 };
 
 export default userHandler;

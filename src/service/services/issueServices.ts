@@ -208,13 +208,14 @@ const updateIssueDetails = async (
   callback: sendUnaryData<UpdateIssueDetailsResponse>
 ) => {
   try {
-    const { description, issueId } = call.request;
+    const { description, issueId, title } = call.request;
     // @ts-ignore
     const userId = call.user?.userId;
     const result = await issueModel.updateIssueDetails(
       parseInt(issueId),
       description,
-      userId
+      userId,
+      title
     );
     callback(null, {
       message: result.message || "Issue details updated successfully",

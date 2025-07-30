@@ -10,6 +10,18 @@ service UserService {
   rpc verifyOTP(VerifyOTPRequest) returns (VerifyOTPResponse);
   rpc ForgetPassword(ForgetPasswordRequest) returns (ForgetPasswordResponse);
   rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
+  rpc GetMe(GetMeRequest) returns (GetMeResponse);
+}
+
+message GetMeRequest {
+}
+
+message GetMeResponse {
+    string name = 1;
+    string email = 2;
+    string phone = 3;
+    string role = 4;
+    string message = 5;
 }
 
 message SendOTPRequest {

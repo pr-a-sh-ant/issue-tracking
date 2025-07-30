@@ -145,12 +145,28 @@ const resetPassword = async (
   }
 };
 
+const getMe = async (userId: number) => {
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      "SELECT  name, email, phone, role FROM users WHERE id = ?",
+      [userId]
+    );
+    if (rows.length === 0) {
+      throw new Error("User not found");
+    }
+    return rows[0];
+  } catch (error: any) {
+    throw new Error(error.message || "Database error");
+  }
+};
+
 const UserModel = {
   LoginUser,
   RegisterUser,
   verifyUser,
   forgetPassword,
   resetPassword,
+  getMe,
 };
 
 export default UserModel;

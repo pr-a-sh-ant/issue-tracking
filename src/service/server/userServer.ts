@@ -32,6 +32,7 @@ const handler: UserServiceHandlers = {
   ResetPassword: withAuth(userHandler.resetPassword),
   SendOTP: userHandler.sendOTP,
   verifyOTP: userHandler.verifyOTP,
+  GetMe: withAuth(userHandler.getMe),
 };
 
 userServer.addService(userDef.user.UserService.service, handler);

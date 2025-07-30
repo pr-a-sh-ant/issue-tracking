@@ -131,14 +131,14 @@ const updateIssueDetails = async (
   next: NextFunction
 ) => {
   const { issueId } = req.params;
-  const { description } = req.body;
+  const { description, title } = req.body;
 
   if (!issueId || !description) {
     return next(new AppError("Issue ID and description are required", 400));
   }
 
   issueClient.UpdateIssueDetails(
-    { issueId, description },
+    { issueId, description, title },
     req.metadata,
     (error, response) => {
       if (error) {
