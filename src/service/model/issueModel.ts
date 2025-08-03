@@ -351,11 +351,30 @@ const dashboardIssues = async (user: User) => {
 
 const deleteIssue = async (issueId: number, userId: number) => {
   try {
+    // Check if the issue exists and is owned by the user
+    const checkSql = mysql2.format(
+      "SELECT created_by FROM issues WHERE issue_id = ?",
+      [issueId]
+    );
+    const [checkResult] = await pool.query<RowDataPacket[]>(checkSql);
+    if (checkResult[0].created_by !== userId) {
+      throw new GrpcError(
+        "You do not have permission to delete this issue",
+        grpcStatus.PERMISSION_DENIED
+      );
+    }
+
+    const audit_sql = mysql2.format(
+      "DELETE FROM audit_logs WHERE issue_id = ?",
+      [issueId]
+    );
+    await pool.query<RowDataPacket[]>(audit_sql);
     const sql = mysql2.format(
       "DELETE FROM issues WHERE issue_id = ? AND status = 'NEW' AND created_by = ?",
       [issueId, userId]
     );
     const [result] = await pool.query<RowDataPacket[]>(sql);
+
     const affectedRows = (result as OkPacketParams).affectedRows;
     if (affectedRows === 0) {
       throw new GrpcError(
