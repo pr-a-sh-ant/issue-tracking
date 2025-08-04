@@ -154,6 +154,7 @@ message IssueShort {
     ImpactEnum impact = 5;
     string created_by = 6;
     string created_at = 7;
+    string description = 8;
 }
 
 message ListIssuesResponse {
