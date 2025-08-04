@@ -64,7 +64,8 @@ const listIssues = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { page = 0, limit = 0, priority = "", status = "" } = req.body || {};
+  const { page = 0, limit = 0, priority = "", status = "" } = req.params || {};
+  // const { page = 0, limit = 0, priority = "", status = "" } = req.body || {};
   issueClient.ListIssuesByUser(
     {
       page: page.toString(),
@@ -89,7 +90,8 @@ const getAllIssues = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { page = 0, limit = 0, priority = "", status = "" } = req.body;
+  const { page = 0, limit = 0, priority = "", status = "" } = req.params || {};
+  // const { page = 0, limit = 0, priority = "", status = "" } = req.body;
 
   issueClient.ListIssues(
     { page: page.toString(), limit: limit.toString(), priority, status },
