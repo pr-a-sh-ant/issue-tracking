@@ -64,14 +64,13 @@ const listIssues = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { page = 0, limit = 0, priority = "", status = "" } = req.params || {};
-  // const { page = 0, limit = 0, priority = "", status = "" } = req.body || {};
+  const { page = 0, limit = 0, priority = "", status = "" } = req.query || {};
   issueClient.ListIssuesByUser(
     {
       page: page.toString(),
       limit: limit.toString(),
-      priority,
-      status,
+      priority: priority.toString(),
+      status: status.toString(),
     },
     req.metadata,
     (error, response) => {
@@ -90,11 +89,15 @@ const getAllIssues = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { page = 0, limit = 0, priority = "", status = "" } = req.params || {};
-  // const { page = 0, limit = 0, priority = "", status = "" } = req.body;
+  const { page = 0, limit = 0, priority = "", status = "" } = req.query || {};
 
   issueClient.ListIssues(
-    { page: page.toString(), limit: limit.toString(), priority, status },
+    {
+      page: page.toString(),
+      limit: limit.toString(),
+      priority: priority.toString(),
+      status: status.toString(),
+    },
     req.metadata,
     (error, response) => {
       if (error) {
