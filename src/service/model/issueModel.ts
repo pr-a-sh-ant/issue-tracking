@@ -118,7 +118,7 @@ const listIssuesByUser = async (
 ) => {
   try {
     let baseSql =
-      "SELECT i.issue_id, i.title, i.status, i.impact, u.name as created_by, i.admin_id, i.created_at, i.priority FROM issues i INNER JOIN users u ON i.created_by = u.id";
+      "SELECT i.issue_id, i.title, i.status, i.impact, u.name as created_by, i.admin_id, i.created_at, i.urgency FROM issues i INNER JOIN users u ON i.created_by = u.id";
     const whereClauses: string[] = [];
     const params: any[] = [];
 
@@ -152,7 +152,7 @@ const listIssuesByUser = async (
       baseSql += " LIMIT ? OFFSET ?";
       params.push(limit, (page - 1) * limit);
     }
-
+    baseSql += " ORDER BY i.created_at DESC";
     const sql = mysql2.format(baseSql, params);
     const [rows] = await pool.query<RowDataPacket[]>(sql);
     if (rows.length === 0) {
@@ -191,6 +191,7 @@ const listAllIssues = async (
     if (whereClauses.length > 0) {
       baseSql += " WHERE " + whereClauses.join(" AND ");
     }
+    baseSql += " ORDER BY i.created_at DESC";
 
     if (
       typeof limit === "number" &&

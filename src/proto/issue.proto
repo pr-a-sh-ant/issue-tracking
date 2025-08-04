@@ -150,7 +150,7 @@ message IssueShort {
     string issue_id = 1;
     string title = 2;
     StatusEnum status = 3;
-    string priority = 4;
+    UrgencyEnum urgency = 4;
     ImpactEnum impact = 5;
     string created_by = 6;
     string created_at = 7;

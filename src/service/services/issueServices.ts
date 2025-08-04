@@ -183,6 +183,7 @@ const listIssuesByUser = async (
     //@ts-ignore
     const user = call.user;
     const { page, limit, priority, status } = call.request;
+    console.log(page, limit, priority, status);
     const result = await issueModel.listIssuesByUser(
       user.userId,
       user.role,
