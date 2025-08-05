@@ -11,6 +11,21 @@ service UserService {
   rpc ForgetPassword(ForgetPasswordRequest) returns (ForgetPasswordResponse);
   rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
   rpc GetMe(GetMeRequest) returns (GetMeResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+}
+
+message RefreshTokenRequest {
+    string token = 1;
+}
+
+message RefreshTokenResponse {
+    string message = 1;
+    Token token = 2;
+}
+
+message Token{
+    string accessToken = 1;
+    string refreshToken = 2;
 }
 
 message GetMeRequest {
@@ -78,7 +93,7 @@ message RegisterRequest {
 
 message RegisterResponse {
     string message = 1;
-    string token = 2;
+    Token token = 2;
     string role = 3;
 }
 
@@ -90,6 +105,6 @@ message LoginRequest {
 
 message LoginResponse {
     string message = 1;
-    string token = 2;
+    Token token = 2;
     string role = 3;
 }

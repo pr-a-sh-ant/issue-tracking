@@ -222,7 +222,7 @@ const updateIssueDetails = async (
 ) => {
   try {
     const sql = mysql2.format(
-      "UPDATE issues SET description = ?, title=? updated_at = NOW() WHERE issue_id = ? AND created_by = ?",
+      "UPDATE issues SET description = ?, title=?, updated_at = NOW() WHERE issue_id = ? AND created_by = ?",
       [description, title, issueId, user_id]
     );
     const [result] = await pool.query<RowDataPacket[]>(sql);

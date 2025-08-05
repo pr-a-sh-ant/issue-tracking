@@ -16,11 +16,13 @@ import { VerifyOTPRequest } from "src/proto/user/VerifyOTPRequest";
 import { VerifyOTPResponse } from "src/proto/user/VerifyOTPResponse";
 import { GetMeRequest } from "src/proto/user/GetMeRequest";
 import { GetMeResponse } from "src/proto/user/GetMeResponse";
+import { RefreshTokenRequest } from "src/proto/user/RefreshTokenRequest";
+import { RefreshTokenResponse } from "src/proto/user/RefreshTokenResponse";
 
 // Importing the helper functions and models
 import UserModel from "../model/userModel";
+import { validateTokenCache } from "../../redis/tokenCache";
 import { generateToken } from "../../utils/token";
-import { setToken } from "../../redis/tokenCache";
 import sendOTPUtils from "../../utils/sendOTPUtils";
 import {
   validateOTPCache,
@@ -41,8 +43,7 @@ const LoginRequest = async (
   try {
     const { email, password, phone } = call.request;
     const data = await UserModel.LoginUser({ email, password, phone });
-    const token = generateToken({ userId: data.id, role: data.role }, 3600);
-    await setToken(token, data.id.toString(), 3600);
+    const token = generateToken({ userId: data.id, role: data.role });
     callback(null, {
       message: "Login successful",
       token: token,
@@ -63,8 +64,7 @@ const RegisterUser = async (
   try {
     const userDetail = call.request;
     const data = await UserModel.RegisterUser(userDetail);
-    const token = generateToken({ userId: data.insertId, role: "user" }, 3600);
-    await setToken(token, data.insertId.toString(), 3600);
+    const token = generateToken({ userId: data.insertId, role: "user" });
     callback(null, {
       message: "Registration successful",
       token: token,
@@ -222,6 +222,33 @@ const getMe = async (
   }
 };
 
+const refreshToken = async (
+  call: ServerUnaryCall<RefreshTokenRequest, RefreshTokenResponse>,
+  callback: sendUnaryData<RefreshTokenResponse>
+) => {
+  try {
+    const { token } = call.request;
+    const userId = await validateTokenCache(token);
+    const userDetail = await UserModel.refreshToken(parseInt(userId));
+    if (!userId) {
+      return callback({
+        code: status.UNAUTHENTICATED,
+        details: "Invalid or expired refresh token",
+      });
+    }
+    const newTokens = generateToken(userDetail);
+    callback(null, {
+      message: "Tokens refreshed successfully",
+      token: newTokens,
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      details: error.message || "Internal server error",
+    });
+  }
+};
+
 const userHandler = {
   LoginRequest,
   RegisterUser,
@@ -231,6 +258,7 @@ const userHandler = {
   sendOTP,
   verifyOTP,
   getMe,
+  refreshToken,
 };
 
 export default userHandler;

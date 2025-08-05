@@ -224,6 +224,32 @@ const getMe = async (
   }
 };
 
+const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return next(new AppError("Token is required", 400));
+    }
+    userClient.RefreshToken({ token }, (error, response) => {
+      if (error) {
+        return next(
+          new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
+        );
+      }
+      res.status(200).json({
+        message: response.message,
+        token: response.token,
+      });
+    });
+  } catch (error: any) {
+    return next(new AppError(error.message || "Failed to refresh token", 500));
+  }
+};
+
 const authViews = {
   login,
   register,
@@ -233,6 +259,7 @@ const authViews = {
   forgetPassword,
   resetPassword,
   getMe,
+  refreshToken,
 };
 
 export default authViews;

@@ -160,6 +160,22 @@ const getMe = async (userId: number) => {
   }
 };
 
+const refreshToken = async (userId: number) => {
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      "SELECT role FROM users WHERE id = ?",
+      [userId]
+    );
+    if (rows.length === 0) {
+      throw new Error("User not found");
+    }
+    return {
+      userId: userId,
+      role: rows[0].role,
+    };
+  } catch (error: any) {}
+};
+
 const UserModel = {
   LoginUser,
   RegisterUser,
@@ -167,6 +183,7 @@ const UserModel = {
   forgetPassword,
   resetPassword,
   getMe,
+  refreshToken,
 };
 
 export default UserModel;

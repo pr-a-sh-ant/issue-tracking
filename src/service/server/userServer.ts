@@ -33,6 +33,7 @@ const handler: UserServiceHandlers = {
   SendOTP: userHandler.sendOTP,
   verifyOTP: userHandler.verifyOTP,
   GetMe: withAuth(userHandler.getMe),
+  RefreshToken: userHandler.refreshToken,
 };
 
 userServer.addService(userDef.user.UserService.service, handler);
