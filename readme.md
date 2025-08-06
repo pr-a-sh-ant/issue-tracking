@@ -24,7 +24,7 @@ You can find the complete API documentation at:
 ```
 config/         # App configuration
 src/
-  config/       # TypeScript config files
+  config/       # TypeScript config files with env
   db/           # Database connection logic
   gateway/      # Express API gateway (routes, views, middleware)
   proto/        # gRPC proto files and generated types

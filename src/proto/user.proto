@@ -12,7 +12,41 @@ service UserService {
   rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
   rpc GetMe(GetMeRequest) returns (GetMeResponse);
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc ChangeAdminPassword(ChangeAdminPasswordRequest) returns (ChangeAdminPasswordResponse);
+  rpc DeleteAdmin(DeleteAdminRequest) returns (DeleteAdminResponse);
+  rpc GetAllAdmins(GetAllAdminsRequest) returns (GetAllAdminsResponse);
 }
+message GetAllAdminsRequest {
+}
+
+message GetAllAdminsResponse {
+    repeated Admin adminList = 1;
+}
+
+message Admin {
+    string adminId = 1;
+    string name = 2;
+    string email = 3;
+    string createdAt = 6; // Timestamp of when the admin was created
+}
+
+message ChangeAdminPasswordRequest {
+    string adminId = 1;
+    string newPassword = 2;
+}
+
+message ChangeAdminPasswordResponse {
+    string message = 1;
+    string newPassword = 2;
+}
+
+message DeleteAdminRequest {
+    string adminId = 1;
+}
+message DeleteAdminResponse {
+    string message = 1;
+}
+
 
 message RefreshTokenRequest {
     string token = 1;

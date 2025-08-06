@@ -18,4 +18,8 @@ authRouter.post("/reset-password", authViews.resetPassword);
 
 authRouter.post("/create-admin", authViews.createAdmin);
 
+authRouter.post("/change-admin-password", authViews.changeAdminPassword);
+authRouter.delete("/delete-admin/:adminId", authViews.deleteAdmin);
+authRouter.get("/get-all-admins", authViews.getAllAdmins);
+
 export default authRouter;

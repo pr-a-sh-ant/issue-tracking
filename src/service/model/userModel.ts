@@ -3,6 +3,7 @@ import { RowDataPacket, OkPacketParams } from "mysql2";
 import bcrypt from "bcrypt";
 import { RegisterRequest } from "../../proto/user/RegisterRequest";
 import mysql2 from "mysql2/promise";
+import { Admin } from "../../proto/user/Admin";
 
 export interface User {
   id: number;
@@ -173,7 +174,58 @@ const refreshToken = async (userId: number) => {
       userId: userId,
       role: rows[0].role,
     };
-  } catch (error: any) {}
+  } catch (error: any) {
+    throw new Error(error.message || "Database error");
+  }
+};
+
+const changeAdminPassword = async (adminId: number, newPassword: string) => {
+  try {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const [result] = await pool.query<RowDataPacket[]>(
+      "UPDATE users SET password = ? WHERE id = ?",
+      [hashedPassword, adminId]
+    );
+    const affectedRows = (result as OkPacketParams).affectedRows;
+    if (affectedRows === 0) {
+      throw new Error("User not found or no changes made");
+    }
+    return { message: "Password changed successfully" };
+  } catch (error: any) {
+    throw new Error(error.message || "Database error");
+  }
+};
+
+const deleteAdmin = async (adminId: number) => {
+  try {
+    const randomPass = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(randomPass, 10);
+    const [result] = await pool.query<RowDataPacket[]>(
+      "UPDATE users SET role = 'user' , password = ? where id = ?",
+      [hashedPassword, adminId]
+    );
+    const affectedRows = (result as OkPacketParams).affectedRows;
+    if (affectedRows === 0) {
+      throw new Error("User not found or no changes made");
+    }
+    return { message: "Admin deleted successfully" };
+  } catch (error: any) {
+    throw new Error(error.message || "Database error");
+  }
+};
+
+const getAllAdmins = async () => {
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      "SELECT id as adminId, name, email FROM users WHERE role = 'admin' AND createdAt IS NOT NULL"
+    );
+    if (rows.length === 0) {
+      throw new Error("No admins found");
+    }
+    return rows as Admin[];
+  } catch (error: any) {
+    throw new Error(error.message || "Database error");
+  }
 };
 
 const UserModel = {
@@ -184,6 +236,9 @@ const UserModel = {
   resetPassword,
   getMe,
   refreshToken,
+  deleteAdmin,
+  getAllAdmins,
+  changeAdminPassword,
 };
 
 export default UserModel;

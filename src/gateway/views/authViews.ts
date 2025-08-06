@@ -250,6 +250,77 @@ const refreshToken = async (
   }
 };
 
+const changeAdminPassword = async (
+  req: RequestWithMetadata,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { adminId, newPassword } = req.body;
+    userClient.ChangeAdminPassword(
+      { adminId, newPassword },
+      req.metadata,
+      (error, response) => {
+        if (error) {
+          return next(
+            new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
+          );
+        }
+        res.status(200).json({
+          message: response.message,
+        });
+      }
+    );
+  } catch (error: any) {
+    return next(
+      new AppError(error.message || "Failed to change password", 500)
+    );
+  }
+};
+
+const deleteAdmin = async (
+  req: RequestWithMetadata,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { adminId } = req.params;
+    userClient.DeleteAdmin({ adminId }, req.metadata, (error, response) => {
+      if (error) {
+        return next(
+          new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
+        );
+      }
+      res.status(200).json({
+        message: response.message,
+      });
+    });
+  } catch (error: any) {
+    return next(new AppError(error.message || "Failed to delete admin", 500));
+  }
+};
+
+const getAllAdmins = async (
+  req: RequestWithMetadata,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    userClient.GetAllAdmins({}, req.metadata, (error, response) => {
+      if (error) {
+        return next(
+          new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
+        );
+      }
+      res.status(200).json({
+        admins: response.adminList,
+      });
+    });
+  } catch (error: any) {
+    return next(new AppError(error.message || "Failed to get all admins", 500));
+  }
+};
+
 const authViews = {
   login,
   register,
@@ -259,7 +330,10 @@ const authViews = {
   forgetPassword,
   resetPassword,
   getMe,
+  getAllAdmins,
   refreshToken,
+  changeAdminPassword,
+  deleteAdmin,
 };
 
 export default authViews;

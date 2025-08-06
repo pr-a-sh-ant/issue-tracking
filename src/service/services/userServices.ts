@@ -18,6 +18,12 @@ import { GetMeRequest } from "src/proto/user/GetMeRequest";
 import { GetMeResponse } from "src/proto/user/GetMeResponse";
 import { RefreshTokenRequest } from "src/proto/user/RefreshTokenRequest";
 import { RefreshTokenResponse } from "src/proto/user/RefreshTokenResponse";
+import { ChangeAdminPasswordRequest } from "src/proto/user/ChangeAdminPasswordRequest";
+import { ChangeAdminPasswordResponse } from "src/proto/user/ChangeAdminPasswordResponse";
+import { DeleteAdminRequest } from "src/proto/user/DeleteAdminRequest";
+import { DeleteAdminResponse } from "src/proto/user/DeleteAdminResponse";
+import { GetAllAdminsRequest } from "src/proto/user/GetAllAdminsRequest";
+import { GetAllAdminsResponse } from "src/proto/user/GetAllAdminsResponse";
 
 // Importing the helper functions and models
 import UserModel from "../model/userModel";
@@ -249,6 +255,66 @@ const refreshToken = async (
   }
 };
 
+const ChangeAdminPassword = async (
+  call: ServerUnaryCall<
+    ChangeAdminPasswordRequest,
+    ChangeAdminPasswordResponse
+  >,
+  callback: sendUnaryData<ChangeAdminPasswordResponse>
+) => {
+  try {
+    const { adminId, newPassword } = call.request;
+    const result = await UserModel.changeAdminPassword(
+      parseInt(adminId),
+      newPassword
+    );
+    callback(null, {
+      message: result.message || "Password changed successfully",
+      newPassword,
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INVALID_ARGUMENT,
+      details: error.message || "Internal server error",
+    });
+  }
+};
+
+const DeleteAdmin = async (
+  call: ServerUnaryCall<DeleteAdminRequest, DeleteAdminResponse>,
+  callback: sendUnaryData<DeleteAdminResponse>
+) => {
+  try {
+    const { adminId } = call.request;
+    const result = await UserModel.deleteAdmin(parseInt(adminId));
+    callback(null, {
+      message: result.message || "Admin deleted successfully",
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INVALID_ARGUMENT,
+      details: error.message || "Internal server error",
+    });
+  }
+};
+
+const GetAllAdmins = async (
+  call: ServerUnaryCall<GetAllAdminsRequest, GetAllAdminsResponse>,
+  callback: sendUnaryData<GetAllAdminsResponse>
+) => {
+  try {
+    const admins = await UserModel.getAllAdmins();
+    callback(null, {
+      adminList: admins,
+    });
+  } catch (error: any) {
+    callback({
+      code: status.INTERNAL,
+      details: error.message || "Internal server error",
+    });
+  }
+};
+
 const userHandler = {
   LoginRequest,
   RegisterUser,
@@ -259,6 +325,9 @@ const userHandler = {
   verifyOTP,
   getMe,
   refreshToken,
+  ChangeAdminPassword,
+  DeleteAdmin,
+  GetAllAdmins,
 };
 
 export default userHandler;

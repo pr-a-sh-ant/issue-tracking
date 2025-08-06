@@ -34,6 +34,13 @@ const handler: UserServiceHandlers = {
   verifyOTP: userHandler.verifyOTP,
   GetMe: withAuth(userHandler.getMe),
   RefreshToken: userHandler.refreshToken,
+  ChangeAdminPassword: withAuth(
+    withRoleAuth(["superadmin"], userHandler.ChangeAdminPassword)
+  ),
+  DeleteAdmin: withAuth(withRoleAuth(["superadmin"], userHandler.DeleteAdmin)),
+  GetAllAdmins: withAuth(
+    withRoleAuth(["superadmin"], userHandler.GetAllAdmins)
+  ),
 };
 
 userServer.addService(userDef.user.UserService.service, handler);
