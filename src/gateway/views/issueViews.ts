@@ -7,6 +7,7 @@ import { UrgencyEnum } from "../../proto/issue/UrgencyEnum";
 import formatComments from "../../utils/formatComment";
 import formatListDate from "../../utils/formatDate";
 import AppError from "../../utils/appError";
+import formatIssue from "../../utils/formatIssue";
 
 const createIssue = async (
   req: RequestWithMetadata,
@@ -79,7 +80,8 @@ const listIssues = async (
           new AppError(error.message, AppError.mapGRPCCodeToHTTP(error.code))
         );
       }
-      res.status(200).json(response);
+      const newResponse = formatIssue(response);
+      res.status(200).json(newResponse);
     }
   );
 };

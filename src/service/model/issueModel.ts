@@ -117,8 +117,8 @@ const listIssuesByUser = async (
   status?: string
 ) => {
   try {
-    let baseSql =
-      "SELECT i.issue_id, i.title, i.description, i.status, i.impact, u.name as created_by, i.admin_id, i.created_at, i.urgency FROM issues i INNER JOIN users u ON i.created_by = u.id";
+    let baseSql = `SELECT i.issue_id, i.title, i.description, i.status, i.impact, i.priority, u.name as created_by, 
+      i.admin_id, i.created_at, i.urgency FROM issues i INNER JOIN users u ON i.created_by = u.id`;
     const whereClauses: string[] = [];
     const params: any[] = [];
 
