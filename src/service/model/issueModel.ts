@@ -10,6 +10,7 @@ interface CreateIssueRequestwithUserId extends CreateIssueRequest {
   created_by: number;
   created_at: Date;
   updated_at: Date;
+  priority: string;
 }
 interface DashboardIssuesResponse {
   newIssues: number;

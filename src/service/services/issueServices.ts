@@ -53,6 +53,7 @@ const createIssue = async (
       created_by,
       created_at: new Date(),
       updated_at: new Date(),
+      priority: "P4",
     });
     const logDetail: LogEventTable = {
       action: "CREATE_ISSUE",
