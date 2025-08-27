@@ -156,9 +156,6 @@ const listIssuesByUser = async (
     baseSql += " ORDER BY i.created_at DESC";
     const sql = mysql2.format(baseSql, params);
     const [rows] = await pool.query<RowDataPacket[]>(sql);
-    if (rows.length === 0) {
-      throw new GrpcError("No issues found", grpcStatus.NOT_FOUND);
-    }
     return rows as Issue[];
   } catch (error: any) {
     throw new GrpcError(

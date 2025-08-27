@@ -41,7 +41,7 @@ export default {
       priority: {
         type: Sequelize.ENUM("P1", "P2", "P3", "P4"),
         allowNull: false,
-        defaultValue: "P2",
+        defaultValue: "P4",
       },
       created_by: {
         type: Sequelize.INTEGER,

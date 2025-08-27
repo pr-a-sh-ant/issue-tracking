@@ -219,9 +219,6 @@ const getAllAdmins = async () => {
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT id as adminId, name, email FROM users WHERE role = 'admin' AND createdAt IS NOT NULL"
     );
-    if (rows.length === 0) {
-      throw new Error("No admins found");
-    }
     return rows as Admin[];
   } catch (error: any) {
     throw new Error(error.message || "Database error");
