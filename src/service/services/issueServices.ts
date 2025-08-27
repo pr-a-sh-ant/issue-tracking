@@ -313,10 +313,10 @@ const dashboardIssues = async (
     const result = await issueModel.dashboardIssues(user);
     callback(null, {
       message: "Dashboard issues retrieved successfully",
-      ackIssues: result.ackIssues.toString(),
-      closedIssues: result.closedIssues.toString(),
-      newIssues: result.newIssues.toString(),
-      list: result.list,
+      ackIssues: result ? result.ackIssues.toString() : "0",
+      closedIssues: result ? result.closedIssues.toString() : "0",
+      newIssues: result ? result.newIssues.toString() : "0",
+      list: result ? result.list : [],
     });
   } catch (error: any) {
     callback({
