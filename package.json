@@ -4,10 +4,10 @@
   "scripts": {
     "migration:create": "npx sequelize-cli migration:create --name",
     "start:migrate": "npx sequelize-cli db:migrate",
-    "migration:undo": "npx sequelize-cli db:migrate:undo",
+    "migration:undo": "npx sequelize-cli db:migrate:undo:all",
     "seeder:create": "npx sequelize-cli seed:create --name",
     "start:seed": "npx sequelize-cli db:seed:all",
-    "seed:undo": "npx sequelize-cli db:seed:undo",
+    "seed:undo": "npx sequelize-cli db:seed:undo:all",
     "build": "rimraf dist && npx tsc",
     "preserver": "npm run build",
     "generate:proto": "node_modules/.bin/proto-loader-gen-types -I=src/proto src/proto/*proto --outDir=src/proto/ src/proto/*.proto --grpcLib=@grpc/grpc-js",

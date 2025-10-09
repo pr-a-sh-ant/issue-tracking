@@ -1,18 +1,20 @@
-import { configDotenv } from "dotenv";
+import { configDotenv } from 'dotenv';
 
 configDotenv();
 
 const config = {
   db: {
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "issue_tracking",
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'issue_tracking',
     port: Number(process.env.DB_PORT) || 3306,
   },
   jwtSecret: process.env.JWT_SECRET,
   resetPasswordJwtToken: process.env.RESET_PASSWORD_JWT_TOKEN,
   redisPassword: process.env.REDIS_PASSWORD,
+  redisHost: process.env.REDIS_HOST,
+  redisPort: Number(process.env.REDIS_PORT) || 6379,
 };
 
 export default config;
