@@ -18,6 +18,7 @@ You can find the complete API documentation at:
 - Node.js (v18+ recommended)
 - MySQL server
 - Redis server
+- ProtoBuff
 
 ## Folder Structure
 

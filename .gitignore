@@ -6,6 +6,8 @@
 
 /dist
 
+/env
+
 src/proto/**/*.ts
 src/proto/**/
 
