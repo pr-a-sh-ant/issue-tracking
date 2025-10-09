@@ -129,6 +129,48 @@ REDIS_PASSWORD=your_redis_password
   npm run serve:gateway
   ```
 
+## Docker
+
+This project can also be runned through docker. The setup for the docker can be found on the docker branch.
+
+For running in docker you must be sure that you have docker running. Then you have to create a env folder inside which we will havProductione env for services.
+
+```
+env/
+   db.env
+   server.env
+```
+
+Now for example for each of the env folder is:
+`db.env`
+```env
+MARIADB_ROOT_PASSWORD=root_password
+MARIADB_USER=user
+MARIADB_PASSWORD=user_password
+MARIADB_DATABASE=database_name
+```
+
+`server.env`
+```env
+DB_HOST="mariadb"
+DB_USER=user
+DB_PASSWORD=user_password
+DB_NAME=database_name
+DB_PORT=3306
+
+JWT_SECRET=your jwt secret
+
+REDIS_HOST='redis'
+REDIS_PORT=6379
+
+NODE_ENV=production
+```
+
+Before running any docker command, you have to make sure that you are not running anything on the port 3306 which is by default used by the MySQL.
+
+```bash
+   docker compose up --build -d
+```
 ## License
 
 ISC
