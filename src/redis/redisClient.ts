@@ -2,12 +2,13 @@ import { createClient } from 'redis';
 import config from '../config/config';
 
 const redisClient = createClient({
-  username: 'default',
-  password: config.redisPassword,
-  socket: {
-    host: config.redisHost,
-    port: config.redisPort,
-  },
+  // username: 'default',
+  // password: config.redisPassword,
+  // socket: {
+  //   host: config.redisHost,
+  //   port: config.redisPort,
+  // },
+  url: `redis://${config.redisHost}:${config.redisPort}`,
 });
 
 redisClient.on('error', (err) => console.log('Redis Client Error', err));

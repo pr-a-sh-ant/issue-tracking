@@ -1,0 +1,6 @@
+dist
+node_modules
+.env
+uploads
+.gitignore
+package-lock.json
