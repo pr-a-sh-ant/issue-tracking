@@ -8,8 +8,10 @@ const dbConfig: PoolOptions = {
   database: config.db.database,
   port: config.db.port,
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 20,
   queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
 };
 
 const pool = mysql.createPool(dbConfig);

@@ -12,8 +12,8 @@ const createComment = async (
   try {
     //check if the issue exists and it is created by the user or either the user is an admin
     const checkIssueSql = mysql2.format(
-      "SELECT issues.issue_id FROM issues WHERE issue_id = ? AND (created_by = ? OR EXISTS (SELECT 1 FROM users WHERE id = ? AND role IN ('admin', 'superadmin')))",
-      [issueId, userId, userId]
+      "SELECT i.issue_id FROM issues i LEFT JOIN users u ON u.id = ? WHERE i.issue_id = ? AND (i.created_by = ? OR u.role IN ('admin', 'superadmin'))",
+      [userId, issueId, userId]
     );
     const [issueRows] = await pool.query<RowDataPacket[]>(checkIssueSql);
     if (issueRows.length === 0) {
