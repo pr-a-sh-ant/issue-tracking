@@ -307,10 +307,19 @@ const dashboardIssues = async (user: User) => {
       );
       const [rows] = await pool.query<RowDataPacket[]>(sql);
 
+      if (!rows || rows.length === 0) {
+        return {
+          newIssues: 0,
+          ackIssues: 0,
+          closedIssues: 0,
+          list: [],
+        } as DashboardIssuesResponse;
+      }
+
       return {
-        newIssues: rows[0].newIssues,
-        ackIssues: rows[0].ackIssues,
-        closedIssues: rows[0].closedIssues,
+        newIssues: rows[0].newIssues || 0,
+        ackIssues: rows[0].ackIssues || 0,
+        closedIssues: rows[0].closedIssues || 0,
         list: rows[0].createdAtList 
           ? rows[0].createdAtList.split(',').map((dateStr: string) => 
               new Date(dateStr).toISOString()
@@ -327,7 +336,7 @@ const dashboardIssues = async (user: User) => {
         [user.userId, user.userId]
       );
       const [rows] = await pool.query<RowDataPacket[]>(sql);
-      return rows[0] as DashboardIssuesResponse;
+      return (rows && rows.length > 0 ? rows[0] : { newIssues: 0, ackIssues: 0, closedIssues: 0 }) as DashboardIssuesResponse;
     } else if (user.role === "superadmin") {
       const sql = mysql2.format(
         `SELECT 
@@ -337,7 +346,7 @@ const dashboardIssues = async (user: User) => {
          FROM issues`
       );
       const [rows] = await pool.query<RowDataPacket[]>(sql);
-      return rows[0] as DashboardIssuesResponse;
+      return (rows && rows.length > 0 ? rows[0] : { newIssues: 0, ackIssues: 0, closedIssues: 0 }) as DashboardIssuesResponse;
     }
   } catch (error: any) {
     throw new GrpcError(
