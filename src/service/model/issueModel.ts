@@ -131,11 +131,11 @@ const listIssuesByUser = async (
       params.push(userId);
     }
 
-    if (priority || priority !== "") {
+    if (priority && priority !== "") {
       whereClauses.push("i.priority = ?");
       params.push(priority);
     }
-    if (status || status !== "") {
+    if (status && status !== "") {
       whereClauses.push("i.status = ?");
       params.push(status);
     }
@@ -143,6 +143,8 @@ const listIssuesByUser = async (
     if (whereClauses.length > 0) {
       baseSql += " WHERE " + whereClauses.join(" AND ");
     }
+
+    baseSql += " ORDER BY i.created_at DESC";
 
     if (
       typeof limit === "number" &&
@@ -153,7 +155,6 @@ const listIssuesByUser = async (
       baseSql += " LIMIT ? OFFSET ?";
       params.push(limit, (page - 1) * limit);
     }
-    baseSql += " ORDER BY i.created_at DESC";
     const sql = mysql2.format(baseSql, params);
     const [rows] = await pool.query<RowDataPacket[]>(sql);
     return rows as Issue[];
@@ -177,11 +178,11 @@ const listAllIssues = async (
     const whereClauses: string[] = [];
     const params: any[] = [];
 
-    if (priority || priority !== "") {
+    if (priority && priority !== "") {
       whereClauses.push("i.priority = ?");
       params.push(priority);
     }
-    if (status || status !== "") {
+    if (status && status !== "") {
       whereClauses.push("i.status = ?");
       params.push(status);
     }
@@ -299,30 +300,28 @@ const dashboardIssues = async (user: User) => {
         `SELECT 
           COUNT(CASE WHEN status = 'NEW' THEN 1 END) as newIssues,
           COUNT(CASE WHEN status = 'ACK' THEN 1 END) as ackIssues,
-          COUNT(CASE WHEN (status = 'CLOSED' OR status = 'RESOLVED') THEN 1 END) as closedIssues
+          COUNT(CASE WHEN (status = 'CLOSED' OR status = 'RESOLVED') THEN 1 END) as closedIssues,
+          GROUP_CONCAT(created_at ORDER BY created_at) as createdAtList
          FROM issues WHERE created_by = ?`,
         [user.userId]
       );
       const [rows] = await pool.query<RowDataPacket[]>(sql);
-      const createdAtSql = mysql2.format(
-        "SELECT created_at FROM issues WHERE created_by = ?",
-        [user.userId]
-      );
-      const [createdAtRows] = await pool.query<RowDataPacket[]>(createdAtSql);
 
       return {
         newIssues: rows[0].newIssues,
         ackIssues: rows[0].ackIssues,
         closedIssues: rows[0].closedIssues,
-        list: createdAtRows.map((row) =>
-          new Date(row.created_at).toISOString()
-        ),
+        list: rows[0].createdAtList 
+          ? rows[0].createdAtList.split(',').map((dateStr: string) => 
+              new Date(dateStr).toISOString()
+            )
+          : [],
       } as DashboardIssuesResponse;
     } else if (user.role === "admin") {
       const sql = mysql2.format(
         `SELECT 
-          (SELECT COUNT(*) FROM issues WHERE status = 'NEW') as newIssues,
-          COUNT(CASE WHEN admin_id = ? AND (status = 'ACK') THEN 1 END) as ackIssues,
+          COUNT(CASE WHEN status = 'NEW' THEN 1 END) as newIssues,
+          COUNT(CASE WHEN admin_id = ? AND status = 'ACK' THEN 1 END) as ackIssues,
           COUNT(CASE WHEN admin_id = ? AND (status = 'CLOSED' OR status = 'RESOLVED') THEN 1 END) as closedIssues
          FROM issues`,
         [user.userId, user.userId]
@@ -332,9 +331,9 @@ const dashboardIssues = async (user: User) => {
     } else if (user.role === "superadmin") {
       const sql = mysql2.format(
         `SELECT 
-          (SELECT COUNT(*) FROM issues WHERE status = 'NEW') as newIssues,
-          (SELECT COUNT(*) FROM issues WHERE status = 'ACK') as ackIssues,
-          (SELECT COUNT(*) FROM issues WHERE status = 'CLOSED' OR status = 'RESOLVED') as closedIssues
+          COUNT(CASE WHEN status = 'NEW' THEN 1 END) as newIssues,
+          COUNT(CASE WHEN status = 'ACK' THEN 1 END) as ackIssues,
+          COUNT(CASE WHEN status = 'CLOSED' OR status = 'RESOLVED' THEN 1 END) as closedIssues
          FROM issues`
       );
       const [rows] = await pool.query<RowDataPacket[]>(sql);

@@ -77,7 +77,6 @@ const RegisterUser = async (
       role: "user",
     });
   } catch (error: any) {
-    console.error("Error in RegisterUser:", error);
     callback({
       code: status.ALREADY_EXISTS,
       details: error.message || "Internal server error",
@@ -99,7 +98,6 @@ const AdminRegisterUser = async (
       password: userDetail.password,
     });
   } catch (error: any) {
-    console.error("Error in RegisterUser:", error);
     callback({
       code: status.ALREADY_EXISTS,
       details: error.message || "Internal server error",
