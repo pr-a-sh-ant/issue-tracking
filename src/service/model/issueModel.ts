@@ -368,6 +368,17 @@ const deleteIssue = async (issueId: number, userId: number) => {
       [issueId]
     );
     await pool.query<RowDataPacket[]>(audit_sql);
+    const comment = mysql2.format(
+      "DELETE FROM comment WHERE issue_id = ?",
+      [issueId]
+    );
+    await pool.query<RowDataPacket[]>(comment);
+    const subtask = mysql2.format(
+      "DELETE FROM sub_tasks WHERE issue_id = ?",
+      [issueId]
+    );
+    await pool.query<RowDataPacket[]>(subtask);
+    
     const sql = mysql2.format(
       "DELETE FROM issues WHERE issue_id = ? AND status = 'NEW' AND created_by = ?",
       [issueId, userId]
